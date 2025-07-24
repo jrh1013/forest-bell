@@ -28,22 +28,24 @@ async function selectRegion(page, region) {
 
 async function selectDate(page, date) {
     console.log(`➡ 날짜 선택 시도: ${date}`);
-    await page.waitForSelector('#calPicker', { visible: true });
-    await page.click('#calPicker');
 
-    // 달력 팝업 대기 (최대 10초, 500ms 간격)
-    let visible = false;
-    for (let i = 0; i < 20; i++) {
-        const calendarVisible = await page.$('.ui-datepicker-calendar');
+    // 달력 열기
+    await page.waitForSelector('#calPicker', { visible: true });
+    let popupVisible = false;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        console.log(`➡ 달력 열기 시도 ${attempt}`);
+        await page.click('#calPicker');
+        await page.waitForTimeout(1000);
+
+        const calendarVisible = await page.$('.ui-datepicker');
         if (calendarVisible) {
-            visible = true;
+            popupVisible = true;
             break;
         }
-        await page.waitForTimeout(500);
     }
 
-    if (!visible) {
-        throw new Error('달력 팝업 열기 실패');
+    if (!popupVisible) {
+        throw new Error('달력 팝업 열기 실패 (3회 시도)');
     }
 
     const [year, month, day] = date.split('-').map(v => parseInt(v, 10));
@@ -58,7 +60,7 @@ async function selectDate(page, date) {
         throw new Error(`달력에서 ${targetDay}일 찾기 실패`);
     }
 
-    // 확인 버튼 (닫기)
+    // 닫기 버튼
     const confirmBtn = await page.$('.ui-datepicker-close');
     if (confirmBtn) {
         await confirmBtn.click();
