@@ -1,1 +1,31 @@
-
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예약 조건 추가</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>예약 조건 추가</h1>
+    <form method="POST">
+        <select name="region" required>
+            <option value="">지역 선택</option>
+            <option>서울/인천/경기</option>
+            <option>강원</option>
+            <option>충북</option>
+            <option>대전/충남</option>
+            <option>전북</option>
+            <option>광주/전남</option>
+            <option>대구/경북</option>
+            <option>부산/경남</option>
+            <option>제주</option>
+        </select>
+        <input type="date" name="date" required>
+        <button type="submit" class="btn">저장</button>
+    </form>
+    <a href="{{ url_for('index') }}" class="back">뒤로가기</a>
+</div>
+</body>
+</html>
