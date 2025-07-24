@@ -1,1 +1,49 @@
-
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f8f4;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    padding: 20px;
+    text-align: center;
+}
+h1 {
+    color: #2d8f55;
+}
+.btn {
+    display: inline-block;
+    background: #2d8f55;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    margin: 10px 0;
+}
+.card {
+    background: #fff;
+    margin: 10px auto;
+    padding: 15px;
+    width: 90%;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.delete {
+    color: red;
+    text-decoration: none;
+    font-weight: bold;
+}
+.fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #2d8f55;
+    color: #fff;
+    font-size: 24px;
+    padding: 15px;
+    border-radius: 50%;
+    text-decoration: none;
+}
