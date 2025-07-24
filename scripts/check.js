@@ -26,34 +26,57 @@ async function selectRegion(page, region) {
     }
 }
 
+async function openCalendar(page) {
+    console.log('➡ 달력 열기 시도');
+    let opened = false;
+
+    // 1. 내부 JS 함수 호출 시도
+    try {
+        await page.evaluate(() => {
+            if (typeof fn_openCalendar === 'function') {
+                fn_openCalendar();
+            }
+        });
+        await page.waitForSelector('.ui-datepicker', { visible: true, timeout: 3000 });
+        console.log('✔ 달력 열기 성공 (내부 함수)');
+        return true;
+    } catch {}
+
+    // 2. 포커스 후 Enter 시도
+    try {
+        await page.focus('#calPicker');
+        await page.keyboard.press('Enter');
+        await page.waitForSelector('.ui-datepicker', { visible: true, timeout: 3000 });
+        console.log('✔ 달력 열기 성공 (포커스+Enter)');
+        return true;
+    } catch {}
+
+    // 3. 좌표 클릭 시도
+    try {
+        const rect = await page.evaluate(() => {
+            const el = document.querySelector('#calPicker');
+            const { x, y, width, height } = el.getBoundingClientRect();
+            return { x, y, width, height };
+        });
+        await page.mouse.click(rect.x + rect.width / 2, rect.y + rect.height / 2);
+        await page.waitForSelector('.ui-datepicker', { visible: true, timeout: 3000 });
+        console.log('✔ 달력 열기 성공 (좌표 클릭)');
+        return true;
+    } catch {}
+
+    return opened;
+}
+
 async function selectDate(page, date) {
     console.log(`➡ 날짜 선택 시도: ${date}`);
-
     await page.waitForSelector('#calPicker', { visible: true });
 
-    // Puppeteer 기본 click 대신 실제 이벤트 트리거
-    await page.evaluate(() => {
-        const el = document.querySelector('#calPicker');
-        if (el) {
-            el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-        }
-    });
-
-    // 팝업 대기 (최대 10초)
-    let popupVisible = false;
-    for (let i = 0; i < 20; i++) {
-        const calendarVisible = await page.$('.ui-datepicker');
-        if (calendarVisible) {
-            popupVisible = true;
-            break;
-        }
-        await page.waitForTimeout(500);
+    const success = await openCalendar(page);
+    if (!success) {
+        throw new Error('달력 열기 실패 (모든 시도)');
     }
 
-    if (!popupVisible) {
-        throw new Error('달력 팝업 열기 실패');
-    }
-
+    // 날짜 클릭
     const [year, month, day] = date.split('-').map(v => parseInt(v, 10));
     const targetDay = `${day}`;
     console.log(`➡ 달력에서 날짜 찾기: ${targetDay}`);
@@ -66,7 +89,7 @@ async function selectDate(page, date) {
         throw new Error(`달력에서 ${targetDay}일 찾기 실패`);
     }
 
-    // 확인 버튼 클릭 (달력 닫기)
+    // 닫기 버튼 클릭
     const confirmBtn = await page.$('.ui-datepicker-close');
     if (confirmBtn) {
         await confirmBtn.click();
