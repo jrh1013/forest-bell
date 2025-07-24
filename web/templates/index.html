@@ -1,32 +1,24 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>예약 리스트 관리</title>
-<style>
-body { font-family: Arial; margin: 20px; }
-textarea { width: 100%; height: 300px; }
-button { margin-top: 10px; padding: 10px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>휴양림 예약 모니터링</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<h1>예약 리스트 관리</h1>
-<p>reservations.json 내용을 아래에서 편집 후 저장하세요.</p>
-<textarea id="editor"></textarea><br>
-<button onclick="saveFile()">저장</button>
-<script>
-const fileUrl = 'https://raw.githubusercontent.com/YOUR_USERNAME/forest-reservation-notifier/main/data/reservations.json';
-async function loadFile() {
-    const res = await fetch(fileUrl);
-    const text = await res.text();
-    document.getElementById('editor').value = text;
-}
-function saveFile() {
-    alert('GitHub API로 push하는 기능은 추후 구현 예정');
-}
-loadFile();
-</script>
+<div class="container">
+    <h1>휴양림 예약 모니터링</h1>
+    <button class="btn start">모니터링 시작</button>
+    <p>예약 조건 ({{count}}/15)</p>
+    {% for item in reservations %}
+    <div class="card">
+        <div>{{item.region}}</div>
+        <div>{{item.date}}</div>
+        <a href="{{ url_for('delete', index=loop.index0) }}" class="delete">삭제</a>
+    </div>
+    {% endfor %}
+    <a href="{{ url_for('add') }}" class="fab">+</a>
+</div>
 </body>
 </html>
-
