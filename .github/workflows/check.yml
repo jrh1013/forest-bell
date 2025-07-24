@@ -2,8 +2,8 @@ name: Forest Reservation Checker
 
 on:
   schedule:
-    - cron: "*/3 * * * *"   # 3분마다 실행
-  workflow_dispatch:        # 수동 실행 가능
+    - cron: "*/3 * * * *"
+  workflow_dispatch:
 
 jobs:
   check-reservations:
@@ -32,3 +32,10 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v3
+        with:
+          name: error-screenshots
+          path: |
+            error-*.png
