@@ -26,16 +26,37 @@ async function selectRegion(page, region) {
 }
 
 async function openCalendar(page) {
-    console.log('➡ 달력 열기 (fn_defaultCalendar 실행)');
-    try {
-        await page.evaluate(() => {
-            if (typeof fn_defaultCalendar === 'function') fn_defaultCalendar();
-        });
-    } catch (err) {
-        throw new Error('fn_defaultCalendar 실행 실패');
+    console.log('➡ 달력 열기 시도');
+
+    // 1. fn_defaultCalendar() 실행 시도
+    const fnExists = await page.evaluate(() => typeof fn_defaultCalendar === 'function');
+    if (fnExists === 'function') {
+        await page.evaluate(() => fn_defaultCalendar());
     }
 
-    await page.waitForSelector('.ui-datepicker', { visible: true, timeout: 5000 });
+    // 2. jQuery trigger 시도
+    await page.evaluate(() => {
+        const el = document.querySelector('#calPicker');
+        if (el && typeof window.$ === 'function') {
+            window.$(el).trigger('click');
+        }
+    });
+
+    // 3. 좌표 클릭 시도
+    const rect = await page.evaluate(() => {
+        const el = document.querySelector('#calPicker');
+        if (el) {
+            const { x, y, width, height } = el.getBoundingClientRect();
+            return { x, y, width, height };
+        }
+        return null;
+    });
+    if (rect) {
+        await page.mouse.click(rect.x + rect.width / 2, rect.y + rect.height / 2);
+    }
+
+    // 대기
+    await page.waitForSelector('.ui-datepicker', { visible: true, timeout: 8000 });
     console.log('✔ 달력 팝업 열림');
 }
 
@@ -76,7 +97,7 @@ async function checkReservation(region, date) {
         // 1. 지역 선택
         await selectRegion(page, region);
 
-        // 2. 날짜 선택 (fn_defaultCalendar 호출)
+        // 2. 날짜 선택 (모든 방식 시도)
         await selectDate(page, date);
 
         // 3. 조회 버튼 클릭
