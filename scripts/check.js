@@ -45,7 +45,26 @@ async function selectDate(page, date) {
     console.log(`➡ 날짜 선택: ${date}`);
     await openCalendar(page);
 
-    const day = parseInt(date.split('-')[2], 10);
+    const [year, month, day] = date.split('-').map(Number);
+
+    // 현재 달 확인 후 필요 시 이동
+    for (let i = 0; i < 12; i++) {
+        const current = await page.evaluate(() => {
+            const header = document.querySelector('.ui-datepicker-title')?.innerText || '';
+            return header;
+        });
+
+        if (current.includes(`${year}`) && current.includes(`${month}`)) {
+            console.log(`✔ ${month}월 화면 표시됨`);
+            break;
+        }
+
+        console.log('➡ 다음 달 버튼 클릭');
+        await page.click('.ui-datepicker-next');
+        await page.waitForTimeout(500);
+    }
+
+    // 날짜 클릭
     const dateBtn = await page.$x(`//a[text()="${day}"]`);
     if (dateBtn.length > 0) {
         await dateBtn[0].click();
@@ -54,6 +73,7 @@ async function selectDate(page, date) {
         throw new Error(`달력에서 ${day}일 클릭 실패`);
     }
 
+    // 확인 버튼 클릭
     const confirmBtn = await page.$('.ui-datepicker-close');
     if (confirmBtn) {
         await confirmBtn.click();
