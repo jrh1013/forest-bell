@@ -27,11 +27,7 @@ async function selectRegion(page, region) {
 
 async function openCalendar(page) {
     console.log('➡ 달력 열기 시도');
-
-    // #calPicker 준비될 때까지 대기
     await page.waitForSelector('#calPicker', { visible: true });
-
-    // 클릭 후 팝업 대기
     await page.click('#calPicker');
     console.log('✔ 달력 클릭 완료, 팝업 대기 중');
 
@@ -79,22 +75,16 @@ async function checkReservation(region, date) {
 
         await page.goto('https://www.foresttrip.go.kr/main.do', { waitUntil: 'networkidle2' });
 
-        // 1. 지역 선택
         await selectRegion(page, region);
-
-        // 2. 날짜 선택
         await selectDate(page, date);
 
-        // 3. 조회 버튼 클릭
         console.log('➡ 조회 버튼 클릭');
         await page.waitForSelector('.s_2_btn button', { visible: true });
         await page.click('.s_2_btn button');
 
-        // 4. 결과 페이지 로딩 대기
         await page.waitForNavigation({ waitUntil: 'networkidle2' });
         console.log('✔ 결과 페이지 로딩 완료');
 
-        // 5. 예약 가능 여부 확인
         const text = await page.evaluate(() => document.body.innerText);
         if (text.includes('예약가능')) {
             const msg = `${region} ${date} 예약가능`;
