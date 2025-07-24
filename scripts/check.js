@@ -41,14 +41,21 @@ async function selectDate(page, date) {
     const [year, month, day] = date.split('-').map(Number);
     const targetDate = `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
 
+    // 퇴실일 계산 (다음날)
+    const nextDay = new Date(year, month - 1, day + 1);
+    const nextDate = `${nextDay.getFullYear()}/${String(nextDay.getMonth() + 1).padStart(2, '0')}/${String(nextDay.getDate()).padStart(2, '0')}`;
+
     // 월 이동
     for (let i = 0; i < 12; i++) {
         const months = await page.evaluate(() => {
             return Array.from(document.querySelectorAll('.calendar_wrap .layer_calender b')).map(el => el.innerText.trim());
         });
 
-        if (months.some(m => m.includes(`${year}. ${String(month).padStart(2, '0')}`))) {
-            console.log(`✔ ${month}월 화면 표시됨`);
+        if (
+            months.some(m => m.includes(`${year}. ${String(month).padStart(2, '0')}`)) ||
+            months.some(m => m.includes(`${nextDay.getFullYear()}. ${String(nextDay.getMonth() + 1).padStart(2, '0')}`))
+        ) {
+            console.log(`✔ ${month}월 또는 다음달 화면 표시됨`);
             break;
         }
 
@@ -57,13 +64,24 @@ async function selectDate(page, date) {
         await page.waitForTimeout(500);
     }
 
-    // 날짜 클릭
-    const dateBtn = await page.$(`a[data-date^="${targetDate}"]`);
-    if (dateBtn) {
-        await dateBtn.click();
-        console.log(`✔ 날짜 클릭 완료: ${day}`);
+    // 입실일 클릭
+    const startBtn = await page.$(`a[data-date^="${targetDate}"]`);
+    if (startBtn) {
+        await startBtn.click();
+        console.log(`✔ 입실일 클릭 완료: ${targetDate}`);
     } else {
-        throw new Error(`달력에서 ${targetDate} 클릭 실패`);
+        throw new Error(`입실일 ${targetDate} 클릭 실패`);
+    }
+
+    await page.waitForTimeout(500);
+
+    // 퇴실일 클릭
+    const endBtn = await page.$(`a[data-date^="${nextDate}"]`);
+    if (endBtn) {
+        await endBtn.click();
+        console.log(`✔ 퇴실일 클릭 완료: ${nextDate}`);
+    } else {
+        throw new Error(`퇴실일 ${nextDate} 클릭 실패`);
     }
 
     // 확인 버튼 클릭
