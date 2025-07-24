@@ -30,10 +30,7 @@ async function openCalendar(page) {
     await page.waitForSelector('#calPicker', { visible: true });
     await page.click('#calPicker');
 
-    // 동적 렌더링 대기
-    await page.waitForFunction(() => {
-        return document.querySelectorAll('.ui-datepicker').length > 0;
-    }, { timeout: 20000 });
+    await page.waitForSelector('#forestCalPicker', { visible: true, timeout: 20000 });
     console.log('✔ 달력 팝업 열림');
 }
 
@@ -43,30 +40,33 @@ async function selectDate(page, date) {
 
     const [year, month, day] = date.split('-').map(Number);
 
+    // 목표 날짜 문자열 (ex: 2025/08/13)
+    const targetDate = `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+
     for (let i = 0; i < 12; i++) {
-        const header = await page.evaluate(() => {
-            const el = document.querySelector('.ui-datepicker-title');
-            return el ? el.innerText : '';
+        const months = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('.calendar_wrap .layer_calender b')).map(el => el.innerText.trim());
         });
 
-        if (header.includes(`${year}`) && header.includes(`${month}`)) {
+        if (months.some(m => m.includes(`${year}. ${String(month).padStart(2, '0')}`))) {
             console.log(`✔ ${month}월 화면 표시됨`);
             break;
         }
 
-        await page.click('.ui-datepicker-next');
+        console.log('➡ 다음달 버튼 클릭');
+        await page.click('.next');
         await page.waitForTimeout(500);
     }
 
-    const dateBtn = await page.$x(`//a[text()="${day}"]`);
-    if (dateBtn.length > 0) {
-        await dateBtn[0].click();
+    const dateBtn = await page.$(`a[data-date^="${targetDate}"]`);
+    if (dateBtn) {
+        await dateBtn.click();
         console.log(`✔ 날짜 클릭 완료: ${day}`);
     } else {
-        throw new Error(`달력에서 ${day}일 클릭 실패`);
+        throw new Error(`달력에서 ${targetDate} 클릭 실패`);
     }
 
-    const confirmBtn = await page.$('.ui-datepicker-close');
+    const confirmBtn = await page.$('.cal_button .defBtn.board');
     if (confirmBtn) {
         await confirmBtn.click();
         console.log('✔ 날짜 확인 버튼 클릭 완료');
@@ -79,6 +79,7 @@ async function checkReservation(region, date) {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
+    page.setViewport({ width: 1200, height: 800 });
     page.setDefaultNavigationTimeout(60000);
 
     try {
