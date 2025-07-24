@@ -2,7 +2,7 @@ name: Forest Reservation Checker
 
 on:
   schedule:
-    - cron: "*/3 * * * *"   # 3분마다 실행 (테스트시 1분으로 변경 가능)
+    - cron: "*/3 * * * *"  # 3분마다 실행
   workflow_dispatch:        # 수동 실행 가능
 
 jobs:
@@ -19,7 +19,8 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install puppeteer node-telegram-bot-api
+        run: |
+          npm install puppeteer@21 node-telegram-bot-api
 
       - name: Run checker
         run: node scripts/check.js
