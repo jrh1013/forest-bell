@@ -41,7 +41,7 @@ async function selectDate(page, date) {
     const [year, month, day] = date.split('-').map(Number);
     const targetDate = `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
 
-    // 월 이동 로직
+    // 월 이동
     for (let i = 0; i < 12; i++) {
         const months = await page.evaluate(() => {
             return Array.from(document.querySelectorAll('.calendar_wrap .layer_calender b')).map(el => el.innerText.trim());
@@ -67,14 +67,17 @@ async function selectDate(page, date) {
     }
 
     // 확인 버튼 클릭
-    const confirmBtn = await page.$('.cal_button .defBtn.board');
+    const confirmBtn = await page.$('.defBtn.board');
     if (confirmBtn) {
         await confirmBtn.click();
         console.log('✔ 확인 버튼 클릭 완료');
     }
 
-    // 팝업 닫힘 대기
-    await page.waitForFunction(() => !document.querySelector('#forestCalPicker'), { timeout: 8000 });
+    // 팝업 display:none 대기
+    await page.waitForFunction(() => {
+        const el = document.querySelector('#forestCalPicker');
+        return el && el.style.display === 'none';
+    }, { timeout: 8000 });
     console.log('✔ 팝업 닫힘 확인');
 }
 
