@@ -39,10 +39,9 @@ async function selectDate(page, date) {
     await openCalendar(page);
 
     const [year, month, day] = date.split('-').map(Number);
-
-    // 목표 날짜 문자열 (ex: 2025/08/13)
     const targetDate = `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
 
+    // 월 이동 로직
     for (let i = 0; i < 12; i++) {
         const months = await page.evaluate(() => {
             return Array.from(document.querySelectorAll('.calendar_wrap .layer_calender b')).map(el => el.innerText.trim());
@@ -58,6 +57,7 @@ async function selectDate(page, date) {
         await page.waitForTimeout(500);
     }
 
+    // 날짜 클릭
     const dateBtn = await page.$(`a[data-date^="${targetDate}"]`);
     if (dateBtn) {
         await dateBtn.click();
@@ -66,11 +66,16 @@ async function selectDate(page, date) {
         throw new Error(`달력에서 ${targetDate} 클릭 실패`);
     }
 
+    // 확인 버튼 클릭
     const confirmBtn = await page.$('.cal_button .defBtn.board');
     if (confirmBtn) {
         await confirmBtn.click();
-        console.log('✔ 날짜 확인 버튼 클릭 완료');
+        console.log('✔ 확인 버튼 클릭 완료');
     }
+
+    // 팝업 닫힘 대기
+    await page.waitForFunction(() => !document.querySelector('#forestCalPicker'), { timeout: 8000 });
+    console.log('✔ 팝업 닫힘 확인');
 }
 
 async function checkReservation(region, date) {
@@ -91,8 +96,10 @@ async function checkReservation(region, date) {
         await selectRegion(page, region);
         await selectDate(page, date);
 
-        console.log('➡ 조회 버튼 클릭');
-        await page.waitForSelector('.s_2_btn button', { visible: true });
+        // 조회 버튼 활성화 대기 후 클릭
+        console.log('➡ 조회 버튼 활성화 대기');
+        await page.waitForSelector('.s_2_btn button:not([disabled])', { visible: true });
+        console.log('✔ 조회 버튼 클릭');
         await page.click('.s_2_btn button');
 
         await page.waitForNavigation({ waitUntil: 'networkidle2' });
