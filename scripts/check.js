@@ -26,19 +26,15 @@ async function selectRegion(page, region) {
 }
 
 async function openCalendar(page) {
-    console.log('➡ 달력 열기 시도');
+    console.log('➡ 달력 열기');
     await page.waitForSelector('#calPicker', { visible: true });
     await page.click('#calPicker');
-    console.log('✔ 달력 클릭 완료, 팝업 대기 중');
 
-    try {
-        await page.waitForSelector('.ui-datepicker', { visible: true, timeout: 20000 });
-        console.log('✔ 달력 팝업 열림');
-    } catch (err) {
-        console.error('❗ 달력 열기 실패: 스크린샷 저장');
-        await page.screenshot({ path: `error-calendar-${Date.now()}.png`, fullPage: true });
-        throw err;
-    }
+    // 동적 렌더링 대기
+    await page.waitForFunction(() => {
+        return document.querySelectorAll('.ui-datepicker').length > 0;
+    }, { timeout: 20000 });
+    console.log('✔ 달력 팝업 열림');
 }
 
 async function selectDate(page, date) {
@@ -47,24 +43,21 @@ async function selectDate(page, date) {
 
     const [year, month, day] = date.split('-').map(Number);
 
-    // 현재 달 확인 후 필요 시 이동
     for (let i = 0; i < 12; i++) {
-        const current = await page.evaluate(() => {
-            const header = document.querySelector('.ui-datepicker-title')?.innerText || '';
-            return header;
+        const header = await page.evaluate(() => {
+            const el = document.querySelector('.ui-datepicker-title');
+            return el ? el.innerText : '';
         });
 
-        if (current.includes(`${year}`) && current.includes(`${month}`)) {
+        if (header.includes(`${year}`) && header.includes(`${month}`)) {
             console.log(`✔ ${month}월 화면 표시됨`);
             break;
         }
 
-        console.log('➡ 다음 달 버튼 클릭');
         await page.click('.ui-datepicker-next');
         await page.waitForTimeout(500);
     }
 
-    // 날짜 클릭
     const dateBtn = await page.$x(`//a[text()="${day}"]`);
     if (dateBtn.length > 0) {
         await dateBtn[0].click();
@@ -73,7 +66,6 @@ async function selectDate(page, date) {
         throw new Error(`달력에서 ${day}일 클릭 실패`);
     }
 
-    // 확인 버튼 클릭
     const confirmBtn = await page.$('.ui-datepicker-close');
     if (confirmBtn) {
         await confirmBtn.click();
@@ -115,6 +107,7 @@ async function checkReservation(region, date) {
         }
     } catch (err) {
         console.error(`❗ Error: ${region} - ${date}: ${err.message}`);
+        await page.screenshot({ path: `error-${region}-${Date.now()}.png`, fullPage: true });
     } finally {
         await browser.close();
     }
