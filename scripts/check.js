@@ -41,7 +41,7 @@ async function selectDate(page, date) {
     const [year, month, day] = date.split('-').map(Number);
     const targetDate = `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
 
-    // 퇴실일 계산 (다음날)
+    // 퇴실일 (다음날)
     const nextDay = new Date(year, month - 1, day + 1);
     const nextDate = `${nextDay.getFullYear()}/${String(nextDay.getMonth() + 1).padStart(2, '0')}/${String(nextDay.getDate()).padStart(2, '0')}`;
 
@@ -127,7 +127,7 @@ async function checkReservation(region, date) {
         console.log('✔ 결과 페이지 로딩 완료');
 
         const text = await page.evaluate(() => document.body.innerText);
-        if (text.includes('예약가능')) {
+        if (text.includes('[예약가능]')) {
             const msg = `${region} ${date} 예약가능`;
             console.log('✅ ' + msg);
             await bot.sendMessage(CHAT_ID, msg);
