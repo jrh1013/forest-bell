@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>휴양림 예약 모니터링</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
 <div class="container">
     <h1>휴양림 예약 모니터링</h1>
-    <button class="btn start">모니터링 시작</button>
+    <button id="monitorBtn" class="btn" style="background: {{ 'gray' if monitoring else 'green' }};">
+        {{ '모니터링 종료' if monitoring else '모니터링 시작' }}
+    </button>
     <p>예약 조건 ({{count}}/15)</p>
     {% for item in reservations %}
     <div class="card">
@@ -20,5 +13,20 @@
     {% endfor %}
     <a href="{{ url_for('add') }}" class="fab">+</a>
 </div>
-</body>
-</html>
+
+<script>
+document.getElementById("monitorBtn").addEventListener("click", function() {
+    let action = this.innerText.includes('시작') ? '/start' : '/stop';
+    fetch(action, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "running") {
+                this.innerText = "모니터링 종료";
+                this.style.background = "gray";
+            } else {
+                this.innerText = "모니터링 시작";
+                this.style.background = "green";
+            }
+        });
+});
+</script>
