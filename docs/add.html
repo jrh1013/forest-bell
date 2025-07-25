@@ -83,9 +83,9 @@ function pick(day) {
 
 async function saveItem() {
     const region = document.getElementById('region').value;
-    if (!region || !chosenDate) return alert('지역과 날짜를 선택하세요.');
+    if (!region || !chosenDate) return alert('❌ 지역과 날짜를 선택하세요.');
     const data = await fetchData();
-    if (data.length >= 15) return alert('최대 15개까지 가능');
+    if (data.length >= 15) return alert('❌ 최대 15개까지 가능');
     data.push({ region, date: chosenDate });
     const success = await updateData(data);
     if (success) {
