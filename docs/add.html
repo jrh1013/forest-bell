@@ -2,13 +2,13 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>예약 추가</title>
+    <title>예약 리스트 추가</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
-    <h1>예약 조건 추가</h1>
-    <select id="region">
+    <h1>예약 리스트 추가</h1>
+    <select id="region" style="width:90%; padding:12px; font-size:18px; border-radius:8px; margin-bottom:10px;">
         <option value="">지역 선택</option>
         <option>서울/인천/경기</option>
         <option>강원</option>
@@ -20,8 +20,7 @@
         <option>부산/경남</option>
         <option>제주</option>
     </select>
-    <button class="btn" onclick="showCalendar()">날짜 선택</button>
-    <p id="selectedDate" style="margin:10px; font-weight:bold;"></p>
+    <input type="text" id="dateInput" class="select-input" placeholder="날짜 선택" readonly onclick="showCalendar()">
     <div class="calendar-popup" id="calendar"></div>
     <button class="btn" onclick="saveItem()">저장</button>
     <a href="index.html" class="btn btn-gray">뒤로</a>
@@ -31,10 +30,12 @@
 let chosenDate = "";
 function showCalendar() {
     const calDiv = document.getElementById('calendar');
-    const today = new Date();
-    let html = "<table><tr>";
-    for (let d=1; d<=31; d++) {
-        if ((d-1)%7===0) html += "</tr><tr>";
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+    let html = `<table><tr>`;
+    for (let d = 1; d <= 31; d++) {
+        if ((d - 1) % 7 === 0) html += "</tr><tr>";
         html += `<td onclick="pick(${d})">${d}</td>`;
     }
     html += "</tr></table>";
@@ -43,21 +44,21 @@ function showCalendar() {
 }
 function pick(day) {
     const now = new Date();
-    const month = now.getMonth()+1;
+    const month = now.getMonth() + 1;
     const y = now.getFullYear();
     chosenDate = `${y}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    document.getElementById('selectedDate').textContent = chosenDate;
-    document.getElementById('calendar').style.display='none';
+    document.getElementById('dateInput').value = chosenDate;
+    document.getElementById('calendar').style.display = 'none';
 }
 async function saveItem() {
     const region = document.getElementById('region').value;
     if (!region || !chosenDate) return alert('지역과 날짜를 선택하세요.');
     const data = await fetchData();
-    if (data.length>=15) return alert('최대 15개까지 가능');
+    if (data.length >= 15) return alert('최대 15개까지 가능');
     data.push({ region, date: chosenDate });
     await updateData(data);
     alert("✅ 예약 추가 완료");
-    location.href='index.html';
+    location.href = 'index.html';
 }
 </script>
 </body>
