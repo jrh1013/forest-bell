@@ -1,1 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>예약 리스트 추가</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+    <h1>예약 리스트 추가</h1>
+    <select id="region">
+        <option value="">지역 선택</option>
+        <option>서울/인천/경기</option>
+        <option>강원</option>
+        <option>충북</option>
+        <option>대전/충남</option>
+        <option>전북</option>
+        <option>광주/전남</option>
+        <option>대구/경북</option>
+        <option>부산/경남</option>
+        <option>제주</option>
+    </select>
+    <input type="date" id="dateInput">
+    <button class="btn" onclick="saveItem()">저장</button>
+    <a href="/" class="btn btn-gray">뒤로</a>
+</div>
+<script src="/static/script.js"></script>
+</body>
+</html>
 
