@@ -9,6 +9,11 @@ const bot = new TelegramBot(BOT_TOKEN);
 
 const reservationsFile = path.join(__dirname, '../data/reservations.json');
 
+// delay 함수 (Puppeteer 최신 버전용)
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function selectRegion(page, region) {
     console.log(`➡ 지역 선택: ${region}`);
     await page.waitForSelector('.s_2_locate .label a', { visible: true });
@@ -25,7 +30,7 @@ async function selectRegion(page, region) {
     }, region);
 
     if (!clicked) throw new Error(`지역 "${region}" 클릭 실패`);
-    await page.waitForTimeout(1000);
+    await delay(1000);
     console.log(`✔ 지역 선택 완료: ${region}`);
 }
 
@@ -63,7 +68,7 @@ async function selectDate(page, date) {
 
         console.log('➡ 다음달 버튼 클릭');
         await page.click('.next');
-        await page.waitForTimeout(500);
+        await delay(500);
     }
 
     // 입실일 클릭
@@ -75,7 +80,7 @@ async function selectDate(page, date) {
         throw new Error(`입실일 ${targetDate} 클릭 실패`);
     }
 
-    await page.waitForTimeout(500);
+    await delay(500);
 
     // 퇴실일 클릭
     const endBtn = await page.$(`a[data-date^="${nextDate}"]`);
