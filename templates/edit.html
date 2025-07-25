@@ -8,11 +8,16 @@
 <body>
 <div class="container">
     <h1>예약 리스트 편집</h1>
+    <div>
+        <button class="btn" onclick="openAddForm()">추가</button>
+        <button class="btn" onclick="saveAll()">저장</button>
+        <a href="/" class="btn btn-gray">취소</a>
+    </div>
 
-    <div id="tempList"></div>
+    <div id="tempList" style="margin-top:20px;"></div>
 
-    <button class="btn" id="toggleFormBtn">➕ 추가</button>
-    <div id="formArea" style="display:none; margin-top:15px;">
+    <!-- 추가 UI (숨김) -->
+    <div id="addForm" style="display:none; margin-top:20px;">
         <select id="region">
             <option value="">지역 선택</option>
             <option>서울/인천/경기</option>
@@ -26,76 +31,15 @@
             <option>제주</option>
         </select>
         <input type="date" id="dateInput">
-        <button class="btn" onclick="addItem()">추가</button>
+        <div>
+            <button class="btn" onclick="addTempItem()">추가</button>
+            <button class="btn btn-gray" onclick="closeAddForm()">취소</button>
+        </div>
     </div>
-
-    <br>
-    <button class="btn" onclick="saveAll()">✅ 저장</button>
-    <a href="/" class="btn btn-gray">취소</a>
 </div>
-
 <script src="/static/script.js"></script>
 <script>
-let tempList = [];
-
-// ✅ 토글 입력 폼
-document.getElementById('toggleFormBtn').addEventListener('click', () => {
-    const form = document.getElementById('formArea');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-});
-
-// ✅ 초기 로드: 기존 데이터 불러오기
-(async function loadData() {
-    tempList = await fetchData();
-    renderTempList();
-})();
-
-function renderTempList() {
-    const div = document.getElementById('tempList');
-    div.innerHTML = '';
-    tempList.forEach((item, i) => {
-        const el = document.createElement('div');
-        el.className = "card";
-        el.innerHTML = `${item.region} - ${item.date} <span class="delete" onclick="removeItem(${i})">X</span>`;
-        div.appendChild(el);
-    });
-}
-
-function addItem() {
-    const region = document.getElementById('region').value;
-    const date = document.getElementById('dateInput').value;
-    if (!region || !date) return alert("❌ 지역과 날짜를 선택하세요.");
-    tempList.push({ region, date });
-    renderTempList();
-    document.getElementById('region').value = '';
-    document.getElementById('dateInput').value = '';
-}
-
-function removeItem(index) {
-    tempList.splice(index, 1);
-    renderTempList();
-}
-
-async function saveAll() {
-    const token = getToken();
-    if (!token) return alert("❌ 토큰을 먼저 설정하세요.");
-
-    const res = await fetch("/api/save_all", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `token ${token}`
-        },
-        body: JSON.stringify(tempList)
-    });
-
-    if (res.ok) {
-        alert("✅ 저장 완료!");
-        window.location.href = "/";
-    } else {
-        alert("❌ 저장 실패!");
-    }
-}
+editRender();
 </script>
 </body>
 </html>
