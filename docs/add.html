@@ -35,7 +35,6 @@ function showCalendar() {
     renderCalendar(currentYear, currentMonth);
     document.getElementById('calendar').style.display = 'block';
 }
-
 function renderCalendar(year, month) {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
@@ -57,7 +56,6 @@ function renderCalendar(year, month) {
     html += "</tr></table>";
     document.getElementById('calendar').innerHTML = html;
 }
-
 function prevMonth() {
     currentMonth--;
     if (currentMonth < 0) {
@@ -74,13 +72,11 @@ function nextMonth() {
     }
     renderCalendar(currentYear, currentMonth);
 }
-
 function pick(day) {
     chosenDate = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     document.getElementById('dateInput').value = chosenDate;
     document.getElementById('calendar').style.display = 'none';
 }
-
 async function saveItem() {
     const region = document.getElementById('region').value;
     if (!region || !chosenDate) return alert('❌ 지역과 날짜를 선택하세요.');
@@ -90,7 +86,9 @@ async function saveItem() {
     const success = await updateData(data);
     if (success) {
         alert("✅ 예약 추가 완료");
-        location.href = 'index.html';
+        window.location.href = 'index.html'; // ✅ index.html로 이동
+    } else {
+        alert("❌ 추가 실패");
     }
 }
 </script>
