@@ -10,19 +10,46 @@
     <h1>GitHub 토큰 설정</h1>
     <input type="password" id="tokenInput" placeholder="GitHub Token 입력">
     <button class="btn" id="saveBtn">저장</button>
+    <p id="tokenStatus" style="margin-top:15px; color:#333;"></p>
     <br><br>
     <a href="/" class="btn btn-gray">뒤로</a>
 </div>
+<!-- ✅ script.js 반드시 아래에 로드 -->
 <script src="/static/script.js"></script>
 <script>
-document.getElementById("saveBtn").addEventListener("click", () => {
-    const val = document.getElementById('tokenInput').value.trim();
-    if (!val) {
-        alert("토큰을 입력하세요.");
+document.getElementById("saveBtn").addEventListener("click", async () => {
+    const token = document.getElementById('tokenInput').value.trim();
+    if (!token) {
+        alert("❌ 토큰을 입력하세요.");
         return;
     }
-    saveToken(val);  // ✅ script.js 함수 호출
-    alert("✅ 토큰 저장 완료!");
+
+    // ✅ script.js의 saveToken() 호출
+    if (typeof saveToken === "function") {
+        saveToken(token);
+    } else {
+        alert("❌ saveToken() 로드 실패 - script.js 확인 필요");
+        return;
+    }
+
+    // ✅ GitHub API로 토큰 상태 확인
+    try {
+        const res = await fetch("https://api.github.com/user", {
+            headers: { Authorization: `token ${token}` }
+        });
+        if (!res.ok) {
+            document.getElementById('tokenStatus').textContent = "❌ 토큰이 유효하지 않습니다.";
+            return;
+        }
+        const exp = res.headers.get("GitHub-Authentication-Token-Expiration");
+        if (exp) {
+            document.getElementById('tokenStatus').textContent = `✅ 토큰 저장 완료! 만료일: ${exp}`;
+        } else {
+            document.getElementById('tokenStatus').textContent = "✅ 토큰 저장 완료 (만료일 정보 없음)";
+        }
+    } catch (e) {
+        document.getElementById('tokenStatus').textContent = "❌ 상태 확인 실패";
+    }
 });
 </script>
 </body>
