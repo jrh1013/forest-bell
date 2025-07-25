@@ -15,14 +15,18 @@ async function selectRegion(page, region) {
     await page.click('.s_2_locate .label a');
 
     await page.waitForSelector('#srch_region ul li a', { visible: true });
-    const regionLink = await page.$x(`//a[contains(text(),"${region}")]`);
-    if (regionLink.length > 0) {
-        await regionLink[0].click();
-        console.log(`✔ 지역 선택 완료: ${region}`);
-        await page.waitForTimeout(1000);
-    } else {
-        throw new Error(`지역 "${region}" 클릭 실패`);
-    }
+    const clicked = await page.$$eval('#srch_region ul li a', (links, region) => {
+        const target = Array.from(links).find(link => link.textContent.includes(region));
+        if (target) {
+            target.click();
+            return true;
+        }
+        return false;
+    }, region);
+
+    if (!clicked) throw new Error(`지역 "${region}" 클릭 실패`);
+    await page.waitForTimeout(1000);
+    console.log(`✔ 지역 선택 완료: ${region}`);
 }
 
 async function openCalendar(page) {
@@ -40,8 +44,6 @@ async function selectDate(page, date) {
 
     const [year, month, day] = date.split('-').map(Number);
     const targetDate = `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
-
-    // 퇴실일 (다음날)
     const nextDay = new Date(year, month - 1, day + 1);
     const nextDate = `${nextDay.getFullYear()}/${String(nextDay.getMonth() + 1).padStart(2, '0')}/${String(nextDay.getDate()).padStart(2, '0')}`;
 
