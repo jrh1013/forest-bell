@@ -9,19 +9,21 @@
 <div class="container">
     <h1>GitHub 토큰 설정</h1>
     <input type="password" id="tokenInput" placeholder="GitHub Token 입력">
-    <button class="btn" onclick="save()">저장</button>
+    <button class="btn" id="saveBtn">저장</button>
     <br><br>
     <a href="/" class="btn btn-gray">뒤로</a>
 </div>
 <script src="/static/script.js"></script>
 <script>
-function save() {
-    const val = document.getElementById('tokenInput').value;
-    if (!val) return alert("토큰을 입력하세요.");
-    saveToken(val);
+document.getElementById("saveBtn").addEventListener("click", () => {
+    const val = document.getElementById('tokenInput').value.trim();
+    if (!val) {
+        alert("토큰을 입력하세요.");
+        return;
+    }
+    saveToken(val);  // ✅ script.js 함수 호출
     alert("✅ 토큰 저장 완료!");
-}
+});
 </script>
 </body>
 </html>
-
