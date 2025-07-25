@@ -10,14 +10,12 @@ function saveToken(value) {
     localStorage.setItem('gh_token', value);
 }
 
-// ✅ GitHub에서 reservations.json 읽기
 async function fetchData() {
     const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${filePath}?t=${Date.now()}`;
     const res = await fetch(url, { cache: "no-store" });
     return res.json();
 }
 
-// ✅ GitHub에 reservations.json 업데이트
 async function updateData(data) {
     const token = getToken();
     if (!token) {
@@ -50,7 +48,6 @@ async function updateData(data) {
     return response.status === 200 || response.status === 201;
 }
 
-// ✅ UI 리스트 렌더
 async function render() {
     const data = await fetchData();
     const listDiv = document.getElementById('list');
@@ -65,7 +62,6 @@ async function render() {
     document.getElementById('count').textContent = data.length;
 }
 
-// ✅ 예약 추가
 async function saveItem() {
     const region = document.getElementById('region').value;
     const date = document.getElementById('dateInput').value;
@@ -80,7 +76,6 @@ async function saveItem() {
     }
 }
 
-// ✅ 예약 삭제
 async function del(i) {
     const data = await fetchData();
     data.splice(i, 1);
@@ -90,7 +85,6 @@ async function del(i) {
     }
 }
 
-// ✅ GitHub Actions Workflow 실행
 async function startWorkflow() {
     const token = getToken();
     if (!token) return alert("❌ 토큰을 먼저 저장하세요.");
