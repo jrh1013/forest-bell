@@ -1,0 +1,79 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f8f4;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    padding: 20px;
+    text-align: center;
+}
+h1 {
+    color: #2d8f55;
+}
+.btn {
+    display: inline-block;
+    background: #2d8f55;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 18px;
+    border: none;
+    margin: 10px;
+    cursor: pointer;
+}
+.btn-gray {
+    background: #aaa;
+}
+.card {
+    background: #fff;
+    margin: 10px auto;
+    padding: 15px;
+    width: 90%;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.delete {
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+}
+.fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #2d8f55;
+    color: #fff;
+    font-size: 32px;
+    padding: 15px 18px;
+    border-radius: 50%;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.calendar-popup {
+    display: none;
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+.calendar-popup table {
+    width: 100%;
+    text-align: center;
+}
+.calendar-popup th, .calendar-popup td {
+    padding: 8px;
+    cursor: pointer;
+}
+.calendar-popup td:hover {
+    background: #2d8f55;
+    color: #fff;
+}
