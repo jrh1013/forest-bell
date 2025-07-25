@@ -8,19 +8,17 @@
 <body>
 <div class="container">
     <h1>휴양림 예약 모니터링</h1>
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom:20px;">
         <button class="btn" onclick="startWorkflow()">모니터링 시작</button>
         <a href="/edit" class="btn btn-gray">리스트 편집</a>
     </div>
     <p>예약 조건 (<span id="count">0</span>/15)</p>
     <div id="list"></div>
-
-    <!-- ✅ 플로팅 버튼들 -->
     <a href="/token" class="fab token">TOKEN</a>
 </div>
 <script src="/static/script.js"></script>
 <script>
-render(); // ✅ 페이지 로드 시 예약 리스트 불러오기
+render(); // ✅ 예약 리스트 로드
 </script>
 </body>
 </html>
