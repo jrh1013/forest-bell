@@ -95,7 +95,7 @@ function deleteTempItem(idx) {
 async function saveAll() {
     if (tempList.length === 0) return alert("❌ 추가된 항목이 없습니다.");
     // 1) DB 업데이트
-    const dbRes = await fetch("/api/reservations/bulk", {
+    const dbRes = await fetch("/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(tempList)
