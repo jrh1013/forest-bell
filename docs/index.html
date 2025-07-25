@@ -13,7 +13,7 @@
     <div id="list"></div>
     <!-- 플로팅 버튼 -->
     <a href="add.html" class="fab">+</a>
-    <a href="token.html" class="fab token">T</a>
+    <a href="token.html" class="fab token">TOKEN</a>
 </div>
 <script src="script.js"></script>
 <script>
@@ -29,11 +29,14 @@ async function render() {
     });
     document.getElementById('count').textContent = data.length;
 }
+
 async function del(i) {
     const data = await fetchData();
     data.splice(i, 1);
-    await updateData(data);
-    render();
+    const success = await updateData(data);
+    if (success) {
+        render();
+    }
 }
 render();
 </script>
