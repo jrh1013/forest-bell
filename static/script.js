@@ -1,7 +1,9 @@
+// ✅ GitHub 정보
 const repoOwner = "jrh1013";
 const repoName = "forest-bell";
 const branch = "main";
 
+// ✅ 토큰 관리
 function getToken() {
     return localStorage.getItem('gh_token') || "";
 }
@@ -9,28 +11,125 @@ function saveToken(value) {
     localStorage.setItem('gh_token', value);
 }
 
-// ✅ 예약 리스트 불러오기
+// ✅ 예약 리스트 가져오기
 async function fetchData() {
     const res = await fetch("/api/reservations");
     return await res.json();
 }
 
-// ✅ 예약 리스트 렌더링 (index.html)
+// ✅ index.html 렌더
 async function render() {
-    const data = await fetchData();
+    const res = await fetchData();
     const listDiv = document.getElementById('list');
     if (!listDiv) return;
     listDiv.innerHTML = '';
-    data.forEach(item => {
+    res.forEach(item => {
         const div = document.createElement('div');
         div.className = "card";
         div.innerHTML = `${item.region} - ${item.date}`;
         listDiv.appendChild(div);
     });
-    document.getElementById('count').textContent = data.length;
+    document.getElementById('count').textContent = res.length;
 }
 
-// ✅ GitHub Actions Workflow 실행
+// ✅ 임시 리스트 (edit.html)
+let tempList = [];
+
+// ✅ 편집 페이지 로드
+async function loadEditPage() {
+    const res = await fetchData();
+    tempList = [...res];
+    renderEditList();
+}
+
+// ✅ 편집 리스트 렌더
+function renderEditList() {
+    const listDiv = document.getElementById('editList');
+    listDiv.innerHTML = '';
+    tempList.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = "card";
+        div.innerHTML = `${item.region} - ${item.date} <span class="delete" onclick="removeTemp(${i})">X</span>`;
+        listDiv.appendChild(div);
+    });
+}
+
+// ✅ 추가 폼
+function showAddForm() {
+    document.getElementById('addForm').style.display = 'block';
+}
+function hideAddForm() {
+    document.getElementById('addForm').style.display = 'none';
+}
+
+// ✅ 임시 리스트에 추가
+function addTemp() {
+    const region = document.getElementById('region').value;
+    const date = document.getElementById('dateInput').value;
+    if (!region || !date) return alert("❌ 지역과 날짜를 선택하세요.");
+    tempList.push({ region, date });
+    renderEditList();
+    hideAddForm();
+}
+
+// ✅ 임시 리스트에서 삭제
+function removeTemp(index) {
+    tempList.splice(index, 1);
+    renderEditList();
+}
+
+// ✅ 저장 (DB + GitHub JSON)
+async function saveAll() {
+    if (tempList.length === 0) {
+        alert("❌ 예약 리스트가 비어있습니다.");
+        return;
+    }
+    // 1) DB 저장
+    const res = await fetch("/api/reservations/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(tempList)
+    });
+    if (!res.ok) {
+        alert("❌ 서버 저장 실패");
+        return;
+    }
+    // 2) GitHub JSON 업데이트
+    await updateGitHub(tempList);
+    alert("✅ 저장 완료!");
+    window.location.href = "/";
+}
+
+// ✅ GitHub JSON 업데이트
+async function updateGitHub(data) {
+    const token = getToken();
+    if (!token) {
+        alert("❌ 토큰을 설정하세요.");
+        return;
+    }
+    const filePath = "data/reservations.json";
+    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+    const getRes = await fetch(url, {
+        headers: { Authorization: `token ${token}` }
+    });
+    const fileInfo = await getRes.json();
+    const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    await fetch(url, {
+        method: "PUT",
+        headers: {
+            Authorization: `token ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            message: "Update reservations.json",
+            content: newContent,
+            sha: fileInfo.sha,
+            branch: branch
+        })
+    });
+}
+
+// ✅ 워크플로우 실행
 async function startWorkflow() {
     const token = getToken();
     if (!token) return alert("❌ 토큰을 먼저 저장하세요.");
@@ -43,93 +142,12 @@ async function startWorkflow() {
         },
         body: JSON.stringify({ ref: branch })
     });
-    alert(response.ok ? "✅ 워크플로우 실행 요청 완료!" : "❌ 워크플로우 실행 실패");
-}
-
-// ✅ 편집 화면 로직
-let tempList = [];
-
-// ✅ 편집 초기화
-async function editRender() {
-    tempList = await fetchData();
-    drawTempList();
-}
-
-// ✅ 임시 리스트 렌더링
-function drawTempList() {
-    const tempDiv = document.getElementById('tempList');
-    tempDiv.innerHTML = '';
-    tempList.forEach((item, idx) => {
-        const div = document.createElement('div');
-        div.className = "card";
-        div.innerHTML = `${item.region} - ${item.date} <span class="delete" onclick="deleteTempItem(${idx})">X</span>`;
-        tempDiv.appendChild(div);
-    });
-}
-
-// ✅ 추가 폼 열기
-function openAddForm() {
-    document.getElementById('addForm').style.display = 'block';
-}
-function closeAddForm() {
-    document.getElementById('addForm').style.display = 'none';
-}
-
-// ✅ 임시 리스트에 추가
-function addTempItem() {
-    const region = document.getElementById('region').value;
-    const date = document.getElementById('dateInput').value;
-    if (!region || !date) return alert("❌ 지역과 날짜 선택 필수");
-    tempList.push({ region, date });
-    drawTempList();
-    closeAddForm();
-}
-
-// ✅ 임시 리스트에서 삭제
-function deleteTempItem(idx) {
-    tempList.splice(idx, 1);
-    drawTempList();
-}
-
-// ✅ 저장 (DB + GitHub JSON 동기화)
-async function saveAll() {
-    if (tempList.length === 0) return alert("❌ 추가된 항목이 없습니다.");
-    // 1) DB 업데이트
-    const dbRes = await fetch("/api/reservations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(tempList)
-    });
-    if (!dbRes.ok) {
-        alert("❌ DB 업데이트 실패");
-        return;
+    if (response.ok) {
+        alert("✅ 워크플로우 실행 요청 완료!");
+    } else {
+        alert("❌ 워크플로우 실행 실패");
     }
-    // 2) GitHub 업데이트
-    const token = getToken();
-    if (!token) {
-        alert("❌ 토큰을 먼저 저장하세요.");
-        return;
-    }
-    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/data/reservations.json`;
-    const getRes = await fetch(url, { headers: { Authorization: `token ${token}` } });
-    const fileInfo = await getRes.json();
-    const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(tempList, null, 2))));
-    const response = await fetch(url, {
-        method: "PUT",
-        headers: {
-            Authorization: `token ${token}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            message: "Bulk update reservations",
-            content: newContent,
-            sha: fileInfo.sha,
-            branch
-        })
-    });
-    alert(response.ok ? "✅ 저장 완료" : "❌ GitHub 업데이트 실패");
-    window.location.href = "/";
 }
 
-// ✅ token.html에서 쓸 수 있도록 export
+// ✅ 글로벌
 window.saveToken = saveToken;
