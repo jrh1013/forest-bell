@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import sqlite3
 import os
+import requests
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 DB_FILE = "reservations.db"
@@ -71,6 +72,22 @@ def api_bulk_update():
         for item in data:
             conn.execute("INSERT INTO reservations (region, date) VALUES (?, ?)", (item["region"], item["date"]))
     return jsonify({"success": True, "count": len(data)})
+
+# ✅ API: GitHub → DB 동기화
+@app.route("/api/sync", methods=["POST"])
+def api_sync():
+    url = "https://raw.githubusercontent.com/jrh1013/forest-bell/main/data/reservations.json"
+    try:
+        res = requests.get(url, timeout=10)
+        res.raise_for_status()
+        data = res.json()
+        with sqlite3.connect(DB_FILE) as conn:
+            conn.execute("DELETE FROM reservations")
+            for item in data:
+                conn.execute("INSERT INTO reservations (region, date) VALUES (?, ?)", (item["region"], item["date"]))
+        return jsonify({"success": True, "count": len(data)})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
