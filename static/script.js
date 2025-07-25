@@ -38,7 +38,7 @@ async function render() {
 async function del(id) {
     const res = await fetch(`/api/reservations/${id}`, { method: "DELETE" });
     if (res.ok) {
-        await syncToGitHub(); // GitHub도 업데이트
+        await syncToGitHub(await fetchData()); // GitHub도 최신 반영
         render();
     }
 }
@@ -56,7 +56,7 @@ async function saveItem() {
     });
 
     if (res.ok) {
-        await syncToGitHub();
+        await syncToGitHub(await fetchData());
         alert("✅ 예약 추가 완료");
         window.location.href = "/";
     }
@@ -96,17 +96,28 @@ function removeTemp(index) {
 // ✅ 임시 리스트 저장 (DB + GitHub 동기화)
 async function saveAll() {
     if (tempList.length === 0) return alert("❌ 추가할 데이터가 없습니다.");
-    const res = await fetch("/api/reservations/bulk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: tempList })
-    });
-    if (res.ok) {
-        await syncToGitHub();
+
+    try {
+        // 1. DB 업데이트
+        const res = await fetch("/api/reservations/bulk", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ items: tempList })
+        });
+
+        if (!res.ok) {
+            alert("❌ DB 저장 실패");
+            return;
+        }
+
+        // 2. GitHub JSON 동기화
+        await syncToGitHub(tempList);
+
         alert("✅ 예약 리스트 저장 완료");
         window.location.href = "/";
-    } else {
-        alert("❌ 저장 실패");
+    } catch (err) {
+        console.error("saveAll() 오류:", err);
+        alert("❌ 저장 중 오류 발생");
     }
 }
 
@@ -131,24 +142,25 @@ async function startWorkflow() {
 }
 
 // ✅ GitHub JSON 동기화
-async function syncToGitHub() {
+async function syncToGitHub(data) {
     const token = getToken();
     if (!token) {
         console.warn("⚠ GitHub 토큰 없음 → JSON 업데이트 생략");
         return;
     }
     try {
-        const data = await fetchData();
         const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+        
+        // 기존 파일 정보 가져오기
         const getRes = await fetch(url, {
             headers: { Authorization: `token ${token}` }
         });
-        if (!getRes.ok) {
-            console.error("파일 정보 가져오기 실패:", await getRes.text());
-            return;
-        }
         const fileInfo = await getRes.json();
+
+        // 새 JSON 컨텐츠 생성
         const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+
+        // GitHub API PUT 요청
         await fetch(url, {
             method: "PUT",
             headers: {
@@ -158,10 +170,11 @@ async function syncToGitHub() {
             body: JSON.stringify({
                 message: "Update reservations.json",
                 content: newContent,
-                sha: fileInfo.sha,
+                sha: fileInfo.sha || undefined,
                 branch: branch
             })
         });
+
         console.log("✅ GitHub JSON 동기화 완료");
     } catch (err) {
         console.error("GitHub 업데이트 중 에러:", err);
