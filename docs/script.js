@@ -9,35 +9,68 @@ function getToken() {
 function saveToken(value) {
     localStorage.setItem('gh_token', value);
 }
+
 async function fetchData() {
-    const res = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${filePath}?t=${Date.now()}`);
+    const res = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${filePath}?t=${Date.now()}`, {
+        cache: 'no-store'
+    });
     return await res.json();
 }
+
 async function updateData(data) {
     const token = getToken();
-    if (!token) return alert("토큰을 먼저 저장하세요.");
-    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
-    const getRes = await fetch(url, { headers: { Authorization: `token ${token}` } });
-    const fileInfo = await getRes.json();
-    const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-    const response = await fetch(url, {
-        method: "PUT",
-        headers: { Authorization: `token ${token}` },
-        body: JSON.stringify({
-            message: "Update reservations.json",
-            content: newContent,
-            sha: fileInfo.sha,
-            branch: branch
-        })
-    });
-    if (!response.ok) {
-        console.error("GitHub API Error:", response.status, await response.text());
-        alert("업데이트 실패! 콘솔 확인");
+    if (!token) {
+        alert("❌ 토큰을 먼저 저장하세요.");
+        return false;
+    }
+
+    try {
+        const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+        const getRes = await fetch(url, {
+            headers: { Authorization: `token ${token}` }
+        });
+
+        if (!getRes.ok) {
+            console.error("파일 정보 가져오기 실패:", await getRes.text());
+            alert("❌ GitHub API에서 파일 정보를 가져오지 못했습니다.");
+            return false;
+        }
+
+        const fileInfo = await getRes.json();
+        const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+
+        const response = await fetch(url, {
+            method: "PUT",
+            headers: {
+                Authorization: `token ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: "Update reservations.json",
+                content: newContent,
+                sha: fileInfo.sha,
+                branch: branch
+            })
+        });
+
+        if (response.status === 200 || response.status === 201) {
+            return true;
+        } else {
+            console.error("❌ 업데이트 실패:", await response.text());
+            alert("❌ 업데이트 실패! 콘솔 확인");
+            return false;
+        }
+
+    } catch (err) {
+        console.error("업데이트 중 에러:", err);
+        alert("❌ 요청 중 오류 발생");
+        return false;
     }
 }
+
 async function startWorkflow() {
     const token = getToken();
-    if (!token) return alert("토큰을 먼저 저장하세요.");
+    if (!token) return alert("❌ 토큰을 먼저 저장하세요.");
     const url = `https://api.github.com/repos/${repoOwner}/${repoName}/actions/workflows/check.yml/dispatches`;
     const response = await fetch(url, {
         method: "POST",
@@ -50,7 +83,7 @@ async function startWorkflow() {
     if (response.ok) {
         alert("✅ 워크플로우 실행 요청 완료!");
     } else {
-        console.error("Workflow Error:", response.status, await response.text());
-        alert("워크플로우 실행 실패!");
+        console.error("워크플로우 실행 오류:", await response.text());
+        alert("❌ 워크플로우 실행 실패!");
     }
 }
