@@ -35,10 +35,12 @@ async function del(i) {
     data.splice(i, 1);
     const success = await updateData(data);
     if (success) {
-        alert("✅ 삭제 완료");
-        location.reload();
+        await render(); // ✅ UI 즉시 갱신
+    } else {
+        alert("❌ 삭제 실패");
     }
 }
+
 render();
 </script>
 </body>
