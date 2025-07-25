@@ -10,7 +10,7 @@ function saveToken(value) {
     localStorage.setItem('gh_token', value);
 }
 async function fetchData() {
-    const res = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${filePath}`);
+    const res = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${filePath}?t=${Date.now()}`);
     return await res.json();
 }
 async function updateData(data) {
