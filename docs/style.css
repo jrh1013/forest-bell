@@ -49,7 +49,8 @@ h1 {
     border-radius: 50%;
     background: #2d8f55;
     color: #fff;
-    font-size: 28px;
+    font-size: 14px;
+    font-weight: bold;
     text-align: center;
     line-height: 60px;
     cursor: pointer;
@@ -88,8 +89,8 @@ h1 {
     background: #2d8f55;
     color: #fff;
 }
-/* 날짜 입력 스타일 */
-input.select-input {
+/* 날짜 입력 + 지역 선택 동일 스타일 */
+select, input.select-input {
     width: 90%;
     padding: 12px;
     font-size: 18px;
