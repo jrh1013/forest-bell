@@ -1,44 +1,68 @@
-// ✅ GitHub 관련 설정
 const repoOwner = "jrh1013";
 const repoName = "forest-bell";
+const filePath = "data/reservations.json";
 const branch = "main";
 
-// ✅ 토큰 저장 / 불러오기
 function getToken() {
     return localStorage.getItem('gh_token') || "";
 }
-
 function saveToken(value) {
     localStorage.setItem('gh_token', value);
 }
 
-// ✅ 예약 리스트 불러오기
+// ✅ GitHub에서 reservations.json 읽기
 async function fetchData() {
-    const res = await fetch("/api/reservations");
-    return await res.json();
+    const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${filePath}?t=${Date.now()}`;
+    const res = await fetch(url, { cache: "no-store" });
+    return res.json();
 }
 
-// ✅ 예약 리스트 렌더링
+// ✅ GitHub에 reservations.json 업데이트
+async function updateData(data) {
+    const token = getToken();
+    if (!token) {
+        alert("❌ 토큰을 먼저 저장하세요.");
+        return false;
+    }
+    const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+    const getRes = await fetch(apiUrl, {
+        headers: { Authorization: `token ${token}` }
+    });
+    if (!getRes.ok) {
+        alert("❌ GitHub API 접근 실패");
+        return false;
+    }
+    const fileInfo = await getRes.json();
+    const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    const response = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+            Authorization: `token ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            message: "Update reservations.json",
+            content: newContent,
+            sha: fileInfo.sha,
+            branch: branch
+        })
+    });
+    return response.status === 200 || response.status === 201;
+}
+
+// ✅ UI 리스트 렌더
 async function render() {
-    const res = await fetchData();
+    const data = await fetchData();
     const listDiv = document.getElementById('list');
-    if (!listDiv) return; // index.html에서만 실행
+    if (!listDiv) return;
     listDiv.innerHTML = '';
-    res.forEach(item => {
+    data.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = "card";
-        div.innerHTML = `${item.region} - ${item.date} <span class="delete" onclick="del(${item.id})">삭제</span>`;
+        div.innerHTML = `${item.region} - ${item.date} <span class="delete" onclick="del(${i})">삭제</span>`;
         listDiv.appendChild(div);
     });
-    document.getElementById('count').textContent = res.length;
-}
-
-// ✅ 예약 삭제
-async function del(id) {
-    const res = await fetch(`/api/reservations/${id}`, { method: "DELETE" });
-    if (res.ok) {
-        render();
-    }
+    document.getElementById('count').textContent = data.length;
 }
 
 // ✅ 예약 추가
@@ -46,16 +70,23 @@ async function saveItem() {
     const region = document.getElementById('region').value;
     const date = document.getElementById('dateInput').value;
     if (!region || !date) return alert('❌ 지역과 날짜를 선택하세요.');
-
-    const res = await fetch("/api/reservations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ region, date })
-    });
-
-    if (res.ok) {
+    const data = await fetchData();
+    if (data.length >= 15) return alert('❌ 최대 15개까지 가능');
+    data.push({ region, date });
+    const success = await updateData(data);
+    if (success) {
         alert("✅ 예약 추가 완료");
-        window.location.href = "/";
+        location.href = "/";
+    }
+}
+
+// ✅ 예약 삭제
+async function del(i) {
+    const data = await fetchData();
+    data.splice(i, 1);
+    const success = await updateData(data);
+    if (success) {
+        render();
     }
 }
 
@@ -72,12 +103,7 @@ async function startWorkflow() {
         },
         body: JSON.stringify({ ref: branch })
     });
-    if (response.ok) {
-        alert("✅ 워크플로우 실행 요청 완료!");
-    } else {
-        alert("❌ 워크플로우 실행 실패");
-    }
+    alert(response.ok ? "✅ 워크플로우 실행 요청 완료!" : "❌ 실행 실패");
 }
 
-// ✅ 중요: 글로벌 등록 (token.html에서 접근 가능)
 window.saveToken = saveToken;
