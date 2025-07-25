@@ -13,13 +13,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Cache Puppeteer Chromium
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/puppeteer
+          key: puppeteer-cache
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install puppeteer@21 node-telegram-bot-api
+        run: |
+          npm install puppeteer@22 node-telegram-bot-api
 
       - name: Run checker
         run: node scripts/check.js
