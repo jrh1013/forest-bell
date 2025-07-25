@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>토큰 설정</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -14,7 +15,6 @@
     <br><br>
     <a href="/" class="btn btn-gray">뒤로</a>
 </div>
-<!-- ✅ script.js 반드시 아래에 로드 -->
 <script src="/static/script.js"></script>
 <script>
 document.getElementById("saveBtn").addEventListener("click", async () => {
@@ -23,16 +23,12 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
         alert("❌ 토큰을 입력하세요.");
         return;
     }
-
-    // ✅ script.js의 saveToken() 호출
     if (typeof saveToken === "function") {
         saveToken(token);
     } else {
-        alert("❌ saveToken() 로드 실패 - script.js 확인 필요");
+        alert("❌ saveToken() 로드 실패");
         return;
     }
-
-    // ✅ GitHub API로 토큰 상태 확인
     try {
         const res = await fetch("https://api.github.com/user", {
             headers: { Authorization: `token ${token}` }
@@ -42,11 +38,9 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
             return;
         }
         const exp = res.headers.get("GitHub-Authentication-Token-Expiration");
-        if (exp) {
-            document.getElementById('tokenStatus').textContent = `✅ 토큰 저장 완료! 만료일: ${exp}`;
-        } else {
-            document.getElementById('tokenStatus').textContent = "✅ 토큰 저장 완료 (만료일 정보 없음)";
-        }
+        document.getElementById('tokenStatus').textContent = exp
+            ? `✅ 토큰 저장 완료! 만료일: ${exp}`
+            : "✅ 토큰 저장 완료 (만료일 정보 없음)";
     } catch (e) {
         document.getElementById('tokenStatus').textContent = "❌ 상태 확인 실패";
     }
