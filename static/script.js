@@ -1,7 +1,7 @@
-// ✅ GitHub 관련 설정
 const repoOwner = "jrh1013";
 const repoName = "forest-bell";
 const branch = "main";
+const filePath = "data/reservations.json";
 
 // ✅ 토큰 저장 / 불러오기
 function getToken() {
@@ -12,17 +12,48 @@ function saveToken(value) {
     localStorage.setItem('gh_token', value);
 }
 
-// ✅ 예약 리스트 불러오기
+// ✅ Render DB에서 리스트 불러오기
 async function fetchData() {
     const res = await fetch("/api/reservations");
     return await res.json();
+}
+
+// ✅ GitHub JSON 업데이트
+async function updateGitHub(data) {
+    const token = getToken();
+    if (!token) {
+        console.warn("GitHub 토큰 없음 → JSON 업데이트 스킵");
+        return false;
+    }
+    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+    const getRes = await fetch(url, { headers: { Authorization: `token ${token}` } });
+    if (!getRes.ok) {
+        console.error("파일 정보 가져오기 실패:", await getRes.text());
+        return false;
+    }
+    const fileInfo = await getRes.json();
+    const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+            Authorization: `token ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            message: "Update reservations.json",
+            content: newContent,
+            sha: fileInfo.sha,
+            branch: branch
+        })
+    });
+    return response.ok;
 }
 
 // ✅ 예약 리스트 렌더링
 async function render() {
     const res = await fetchData();
     const listDiv = document.getElementById('list');
-    if (!listDiv) return; // index.html에서만 실행
+    if (!listDiv) return;
     listDiv.innerHTML = '';
     res.forEach(item => {
         const div = document.createElement('div');
@@ -36,17 +67,7 @@ async function render() {
     document.getElementById('count').textContent = res.length;
 }
 
-// ✅ 예약 삭제 (✔ 단일 항목만 삭제 + UI 갱신)
-async function del(id) {
-    const res = await fetch(`/api/reservations/${id}`, { method: "DELETE" });
-    if (res.ok) {
-        await render(); // 삭제 후 리스트 다시 불러오기
-    } else {
-        alert("❌ 삭제 실패");
-    }
-}
-
-// ✅ 예약 추가
+// ✅ 예약 추가 (DB → GitHub)
 async function saveItem() {
     const region = document.getElementById('region').value;
     const date = document.getElementById('dateInput').value;
@@ -59,10 +80,24 @@ async function saveItem() {
     });
 
     if (res.ok) {
+        const dbData = await fetchData();
+        await updateGitHub(dbData);
         alert("✅ 예약 추가 완료");
         window.location.href = "/";
     } else {
         alert("❌ 추가 실패");
+    }
+}
+
+// ✅ 예약 삭제 (DB → GitHub)
+async function del(id) {
+    const res = await fetch(`/api/reservations/${id}`, { method: "DELETE" });
+    if (res.ok) {
+        const dbData = await fetchData();
+        await updateGitHub(dbData);
+        render();
+    } else {
+        alert("❌ 삭제 실패");
     }
 }
 
@@ -86,5 +121,5 @@ async function startWorkflow() {
     }
 }
 
-// ✅ 글로벌 등록 (token.html에서 접근 가능)
+// ✅ 글로벌 등록
 window.saveToken = saveToken;
