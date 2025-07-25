@@ -28,11 +28,16 @@
         }
         #addForm { display: none; background: #fff; padding: 20px; border-radius: 8px; width: 90%; margin: 20px auto; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
         select, input { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
+        #tokenArea { margin: 10px; }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>휴양림 예약 모니터링</h1>
+    <div id="tokenArea">
+        <input type="password" id="tokenInput" placeholder="GitHub Token 입력">
+        <button class="btn" onclick="saveToken()">토큰 저장</button>
+    </div>
     <button class="btn" onclick="startMonitoring()">모니터링 시작</button>
     <p>예약 조건 (<span id="count">0</span>/15)</p>
     <div id="list"></div>
@@ -57,11 +62,21 @@
 <div class="fab" onclick="showForm()">+</div>
 
 <script>
-const repoOwner = "YOUR_GITHUB_USERNAME";
-const repoName = "YOUR_REPO_NAME";
+const repoOwner = "jrh1013";
+const repoName = "forest-bell";
 const filePath = "data/reservations.json";
 const branch = "main";
-const token = "YOUR_GITHUB_TOKEN"; // Personal Access Token 필요
+
+function getToken() {
+    return localStorage.getItem('gh_token') || "";
+}
+
+function saveToken() {
+    const t = document.getElementById('tokenInput').value.trim();
+    if (!t) return alert("토큰을 입력하세요.");
+    localStorage.setItem('gh_token', t);
+    alert("✅ 토큰 저장 완료!");
+}
 
 async function fetchData() {
     try {
@@ -88,6 +103,8 @@ function renderList(data) {
 
 async function updateData(data) {
     try {
+        const token = getToken();
+        if (!token) return alert("토큰을 먼저 입력하세요.");
         const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
         const getRes = await fetch(url, { headers: { Authorization: `token ${token}` } });
         const fileInfo = await getRes.json();
@@ -133,6 +150,8 @@ async function saveItem() {
 
 async function startMonitoring() {
     try {
+        const token = getToken();
+        if (!token) return alert("토큰을 먼저 입력하세요.");
         const url = `https://api.github.com/repos/${repoOwner}/${repoName}/actions/workflows/check.yml/dispatches`;
         const response = await fetch(url, {
             method: 'POST',
