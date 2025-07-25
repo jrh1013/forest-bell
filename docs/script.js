@@ -3,6 +3,7 @@ const repoName = "forest-bell";
 const filePath = "data/reservations.json";
 const branch = "main";
 
+/** ✅ 토큰 가져오기 / 저장 */
 function getToken() {
     return localStorage.getItem('gh_token') || "";
 }
@@ -10,13 +11,25 @@ function saveToken(value) {
     localStorage.setItem('gh_token', value);
 }
 
+/** ✅ 최신 데이터 가져오기 (GitHub API 이용, 캐시 문제 해결) */
 async function fetchData() {
-    const res = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${filePath}?t=${Date.now()}`, {
-        cache: 'no-store'
-    });
-    return await res.json();
+    const token = getToken();
+    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+    const headers = token ? { Authorization: `token ${token}` } : {};
+
+    const res = await fetch(url, { headers });
+    if (!res.ok) {
+        console.error("❌ 데이터 불러오기 실패:", await res.text());
+        return [];
+    }
+    const json = await res.json();
+    if (json.content) {
+        return JSON.parse(decodeURIComponent(escape(atob(json.content))));
+    }
+    return [];
 }
 
+/** ✅ 데이터 업데이트 (SHA 최신화) */
 async function updateData(newData) {
     const token = getToken();
     if (!token) {
@@ -27,18 +40,19 @@ async function updateData(newData) {
     try {
         const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
 
+        // 최신 SHA 가져오기
         const getRes = await fetch(url, {
             headers: { Authorization: `token ${token}` }
         });
         if (!getRes.ok) {
             console.error("파일 정보 가져오기 실패:", await getRes.text());
-            alert("❌ GitHub API에서 파일 정보를 가져오지 못했습니다.");
             return false;
         }
 
         const fileInfo = await getRes.json();
         const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(newData, null, 2))));
 
+        // PUT 요청
         const response = await fetch(url, {
             method: "PUT",
             headers: {
@@ -53,22 +67,24 @@ async function updateData(newData) {
             })
         });
 
-        if (response.status === 200 || response.status === 201) {
+        if (response.ok) {
             return true;
         } else {
             console.error("❌ 업데이트 실패:", await response.text());
             return false;
         }
     } catch (err) {
-        console.error("업데이트 중 에러:", err);
+        console.error("업데이트 중 오류:", err);
         return false;
     }
 }
 
+/** ✅ 워크플로우 실행 */
 async function startWorkflow() {
     const token = getToken();
     if (!token) return alert("❌ 토큰을 먼저 저장하세요.");
     const url = `https://api.github.com/repos/${repoOwner}/${repoName}/actions/workflows/check.yml/dispatches`;
+
     const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -77,10 +93,11 @@ async function startWorkflow() {
         },
         body: JSON.stringify({ ref: branch })
     });
+
     if (response.ok) {
         alert("✅ 워크플로우 실행 요청 완료!");
     } else {
-        console.error("워크플로우 실행 오류:", await response.text());
-        alert("❌ 워크플로우 실행 실패!");
+        console.error("워크플로우 실행 실패:", await response.text());
+        alert("❌ 워크플로우 실행 실패");
     }
 }
