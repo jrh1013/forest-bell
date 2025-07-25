@@ -17,7 +17,7 @@ async function fetchData() {
     return await res.json();
 }
 
-async function updateData(data) {
+async function updateData(newData) {
     const token = getToken();
     if (!token) {
         alert("❌ 토큰을 먼저 저장하세요.");
@@ -26,10 +26,11 @@ async function updateData(data) {
 
     try {
         const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+
+        // ✅ 최신 SHA 가져오기
         const getRes = await fetch(url, {
             headers: { Authorization: `token ${token}` }
         });
-
         if (!getRes.ok) {
             console.error("파일 정보 가져오기 실패:", await getRes.text());
             alert("❌ GitHub API에서 파일 정보를 가져오지 못했습니다.");
@@ -37,8 +38,9 @@ async function updateData(data) {
         }
 
         const fileInfo = await getRes.json();
-        const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+        const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(newData, null, 2))));
 
+        // ✅ PUT 요청
         const response = await fetch(url, {
             method: "PUT",
             headers: {
@@ -60,7 +62,6 @@ async function updateData(data) {
             alert("❌ 업데이트 실패! 콘솔 확인");
             return false;
         }
-
     } catch (err) {
         console.error("업데이트 중 에러:", err);
         alert("❌ 요청 중 오류 발생");
