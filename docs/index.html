@@ -35,7 +35,8 @@ async function del(i) {
     data.splice(i, 1);
     const success = await updateData(data);
     if (success) {
-        render();
+        alert("✅ 삭제 완료");
+        location.reload();
     }
 }
 render();
