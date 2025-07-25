@@ -1,79 +1,57 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #f1f8f4;
-    margin: 0;
-    padding: 0;
-}
-.container {
-    padding: 20px;
-    text-align: center;
-}
-h1 {
-    color: #2d8f55;
-}
-.btn {
-    display: inline-block;
-    background: #2d8f55;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 18px;
-    border: none;
-    margin: 10px;
-    cursor: pointer;
-}
-.btn-gray {
-    background: #aaa;
-}
-.card {
-    background: #fff;
-    margin: 10px auto;
-    padding: 15px;
-    width: 90%;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.delete {
-    color: red;
-    font-weight: bold;
-    cursor: pointer;
-}
 .fab {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
     background: #2d8f55;
     color: #fff;
-    font-size: 32px;
-    padding: 15px 18px;
-    border-radius: 50%;
+    font-size: 28px;
+    line-height: 60px;
     text-align: center;
-    text-decoration: none;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
+
+.fab.token {
+    right: 90px; /* +버튼 왼쪽으로 */
+}
+
 .calendar-popup {
     display: none;
     position: fixed;
-    bottom: 60px;
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%);
     background: #fff;
     border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    padding: 15px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    z-index: 1000;
 }
 .calendar-popup table {
     width: 100%;
+    border-collapse: collapse;
     text-align: center;
 }
 .calendar-popup th, .calendar-popup td {
     padding: 8px;
     cursor: pointer;
+    border-radius: 4px;
 }
 .calendar-popup td:hover {
     background: #2d8f55;
     color: #fff;
+}
+input.select-input {
+    width: 90%;
+    padding: 12px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin: 12px auto;
+    display: block;
+    text-align: center;
+    background: #fff;
+    cursor: pointer;
 }
