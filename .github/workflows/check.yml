@@ -2,7 +2,7 @@ name: Forest Reservation Checker
 
 on:
   schedule:
-    - cron: "*/3 * * * *"  # 3분마다 실행
+    - cron: "*/3 * * * *" # 3분마다 실행
   workflow_dispatch:
 
 jobs:
@@ -12,12 +12,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      - name: Cache Puppeteer Chromium
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/puppeteer
-          key: puppeteer-cache
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
