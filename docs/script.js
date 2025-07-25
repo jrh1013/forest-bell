@@ -27,7 +27,6 @@ async function updateData(newData) {
     try {
         const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
 
-        // ✅ 최신 SHA 가져오기
         const getRes = await fetch(url, {
             headers: { Authorization: `token ${token}` }
         });
@@ -40,7 +39,6 @@ async function updateData(newData) {
         const fileInfo = await getRes.json();
         const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(newData, null, 2))));
 
-        // ✅ PUT 요청
         const response = await fetch(url, {
             method: "PUT",
             headers: {
@@ -59,12 +57,10 @@ async function updateData(newData) {
             return true;
         } else {
             console.error("❌ 업데이트 실패:", await response.text());
-            alert("❌ 업데이트 실패! 콘솔 확인");
             return false;
         }
     } catch (err) {
         console.error("업데이트 중 에러:", err);
-        alert("❌ 요청 중 오류 발생");
         return false;
     }
 }
