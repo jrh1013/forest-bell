@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>토큰 설정</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h1>GitHub 토큰 설정</h1>
+    <input type="password" id="tokenInput" placeholder="GitHub Token 입력">
+    <button class="btn" onclick="save()">저장</button>
+    <br><br>
+    <a href="index.html" class="btn btn-gray">뒤로</a>
+</div>
+<script src="script.js"></script>
+<script>
+function save() {
+    const val = document.getElementById('tokenInput').value;
+    if (!val) return alert("토큰을 입력하세요.");
+    saveToken(val);
+    alert("✅ 토큰 저장 완료!");
+}
+</script>
+</body>
+</html>
