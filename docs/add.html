@@ -28,28 +28,61 @@
 <script src="script.js"></script>
 <script>
 let chosenDate = "";
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+
 function showCalendar() {
+    renderCalendar(currentYear, currentMonth);
+    document.getElementById('calendar').style.display = 'block';
+}
+
+function renderCalendar(year, month) {
     const calDiv = document.getElementById('calendar');
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const year = now.getFullYear();
-    let html = `<table><tr>`;
-    for (let d = 1; d <= 31; d++) {
-        if ((d - 1) % 7 === 0) html += "</tr><tr>";
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    let html = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <button onclick="prevMonth()">◀</button>
+            <span><b>${year}년 ${month + 1}월</b></span>
+            <button onclick="nextMonth()">▶</button>
+        </div>
+        <table>
+            <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
+            <tr>
+    `;
+    for (let i = 0; i < firstDay; i++) html += "<td></td>";
+    for (let d = 1; d <= daysInMonth; d++) {
+        if ((firstDay + d - 1) % 7 === 0 && d !== 1) html += "</tr><tr>";
         html += `<td onclick="pick(${d})">${d}</td>`;
     }
     html += "</tr></table>";
     calDiv.innerHTML = html;
-    calDiv.style.display = 'block';
 }
+
+function prevMonth() {
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    renderCalendar(currentYear, currentMonth);
+}
+
+function nextMonth() {
+    currentMonth++;
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    renderCalendar(currentYear, currentMonth);
+}
+
 function pick(day) {
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const y = now.getFullYear();
-    chosenDate = `${y}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    chosenDate = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     document.getElementById('dateInput').value = chosenDate;
     document.getElementById('calendar').style.display = 'none';
 }
+
 async function saveItem() {
     const region = document.getElementById('region').value;
     if (!region || !chosenDate) return alert('지역과 날짜를 선택하세요.');
