@@ -88,6 +88,10 @@ async function saveAll() {
         body: JSON.stringify(tempData)
     });
     if (res.ok) {
+        // ✅ GitHub reservations.json도 업데이트
+        if (typeof syncToGitHub === "function") {
+            await syncToGitHub(tempData);
+        }
         alert("✅ 예약 리스트 저장 완료");
         window.location.href = "/";
     } else {
