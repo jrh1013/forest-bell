@@ -3,7 +3,7 @@ const repoOwner = "jrh1013";
 const repoName = "forest-bell";
 const branch = "main";
 
-// ✅ 토큰 로컬 저장 / 불러오기
+// ✅ 토큰 저장 / 불러오기
 function getToken() {
     return localStorage.getItem('gh_token') || "";
 }
@@ -16,16 +16,6 @@ function saveToken(value) {
 async function fetchData() {
     const res = await fetch("/api/reservations");
     return await res.json();
-}
-
-// ✅ 예약 리스트 업데이트 (Render API)
-async function updateData(data) {
-    const res = await fetch("/api/reservations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
-    return res.ok;
 }
 
 // ✅ 예약 리스트 렌더링
@@ -89,5 +79,5 @@ async function startWorkflow() {
     }
 }
 
-// ✅ 글로벌 등록
+// ✅ 중요: 글로벌 등록 (token.html에서 접근 가능)
 window.saveToken = saveToken;
