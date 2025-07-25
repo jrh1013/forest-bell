@@ -21,7 +21,7 @@ def monitor_loop():
     global monitoring
     while monitoring:
         print("✅ 모니터링 실행 중...")
-        subprocess.run(["node", "scripts/check.js"])
+        subprocess.run(["node", "../scripts/check.js"])
         time.sleep(180)  # 3분 대기
 
 @app.route('/')
