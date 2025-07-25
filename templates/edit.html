@@ -8,38 +8,34 @@
 <body>
 <div class="container">
     <h1>예약 리스트 편집</h1>
-    <div>
-        <button class="btn" onclick="openAddForm()">추가</button>
-        <button class="btn" onclick="saveAll()">저장</button>
-        <a href="/" class="btn btn-gray">취소</a>
-    </div>
-
-    <div id="tempList" style="margin-top:20px;"></div>
-
-    <!-- 추가 UI (숨김) -->
-    <div id="addForm" style="display:none; margin-top:20px;">
-        <select id="region">
-            <option value="">지역 선택</option>
-            <option>서울/인천/경기</option>
-            <option>강원</option>
-            <option>충북</option>
-            <option>대전/충남</option>
-            <option>전북</option>
-            <option>광주/전남</option>
-            <option>대구/경북</option>
-            <option>부산/경남</option>
-            <option>제주</option>
-        </select>
-        <input type="date" id="dateInput">
-        <div>
-            <button class="btn" onclick="addTempItem()">추가</button>
-            <button class="btn btn-gray" onclick="closeAddForm()">취소</button>
-        </div>
-    </div>
+    <button class="btn" onclick="showAddForm()">+ 추가</button>
+    <button class="btn" onclick="saveAll()">저장</button>
+    <a href="/" class="btn btn-gray">취소</a>
+    <div id="editList" style="margin-top:20px;"></div>
 </div>
+
+<!-- ✅ 추가 폼 -->
+<div id="addForm" style="display:none; margin-top:20px;">
+    <select id="region">
+        <option value="">지역 선택</option>
+        <option>서울/인천/경기</option>
+        <option>강원</option>
+        <option>충북</option>
+        <option>대전/충남</option>
+        <option>전북</option>
+        <option>광주/전남</option>
+        <option>대구/경북</option>
+        <option>부산/경남</option>
+        <option>제주</option>
+    </select>
+    <input type="date" id="dateInput">
+    <button class="btn" onclick="addTemp()">추가</button>
+    <button class="btn btn-gray" onclick="hideAddForm()">취소</button>
+</div>
+
 <script src="/static/script.js"></script>
 <script>
-editRender();
+loadEditPage();
 </script>
 </body>
 </html>
