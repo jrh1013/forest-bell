@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ 추가 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>예약 리스트 편집</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -31,7 +31,10 @@
             <option>부산/경남</option>
             <option>제주</option>
         </select>
-        <input type="date" id="dateInput" data-placeholder="날짜 선택" required>
+        <!-- ✅ 커스텀 날짜 버튼 -->
+        <button type="button" class="date-btn" id="dateBtn">날짜 선택</button>
+        <!-- ✅ 숨겨진 네이티브 date input -->
+        <input type="date" id="dateInput">
         <button class="btn" onclick="addTempItem()">확인</button>
         <button class="btn btn-gray" onclick="cancelAdd()">취소</button>
     </div>
@@ -39,6 +42,22 @@
 <script src="/static/script.js"></script>
 <script>
 let tempData = [];
+
+// ✅ 날짜 선택 버튼 기능
+const dateBtn = document.getElementById("dateBtn");
+const dateInput = document.getElementById("dateInput");
+
+dateBtn.addEventListener("click", () => {
+    dateInput.showPicker(); // ✅ 네이티브 캘린더 열기
+});
+
+dateInput.addEventListener("change", () => {
+    if (dateInput.value) {
+        dateBtn.textContent = dateInput.value; // ✅ 선택한 날짜로 버튼 텍스트 변경
+    } else {
+        dateBtn.textContent = "날짜 선택";
+    }
+});
 
 async function initEdit() {
     const token = localStorage.getItem("github_token");
@@ -71,11 +90,13 @@ function showAddForm() {
 
 function cancelAdd() {
     document.getElementById("addForm").style.display = "none";
+    dateBtn.textContent = "날짜 선택"; // ✅ 초기화
+    dateInput.value = "";
 }
 
 function addTempItem() {
     const region = document.getElementById("region").value;
-    const date = document.getElementById("dateInput").value;
+    const date = dateInput.value;
     if (!region || !date) return alert("❌ 지역과 날짜를 선택하세요.");
     tempData.push({ region, date });
     renderTempList();
