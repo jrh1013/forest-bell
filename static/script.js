@@ -28,7 +28,7 @@ async function render() {
     res.forEach(item => {
         const div = document.createElement('div');
         div.className = "card";
-        div.innerHTML = `${item.region} - ${item.date} <span class="delete" onclick="del(${item.id})">삭제</span>`;
+        div.innerHTML = `${item.region} - ${item.date}`;
         listDiv.appendChild(div);
     });
     document.getElementById('count').textContent = res.length;
