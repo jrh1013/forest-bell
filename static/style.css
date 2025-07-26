@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    background: #f1f8f4;
+    background: #f5f8f6;
     margin: 0;
     padding: 0;
 }
@@ -11,31 +11,37 @@ body {
 h1 {
     color: #2d8f55;
     margin-bottom: 20px;
+    font-size: 28px;
 }
 .btn {
     display: inline-block;
     background: #2d8f55;
     color: #fff;
     padding: 10px 20px;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 18px;
     border: none;
     margin: 10px;
     cursor: pointer;
+    transition: 0.2s ease;
+}
+.btn:hover {
+    background: #249d65;
 }
 .btn-gray {
-    background: #aaa;
+    background: #bbb;
 }
 .card {
     background: #fff;
     margin: 10px auto;
     padding: 15px;
     width: 90%;
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 .delete {
     color: red;
@@ -62,25 +68,31 @@ h1 {
 .fab.token {
     right: 20px;
 }
-/* ✅ 지역 선택 & 날짜 버튼 공통 스타일 */
-select, .date-display {
+/* ✅ 입력 필드 */
+select, input[type="date"] {
     width: 90%;
     padding: 12px;
     font-size: 18px;
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 12px;
     margin: 12px auto;
     display: block;
     text-align: center;
     background: #fff;
     cursor: pointer;
-    height: 50px;
+    height: 55px;
 }
-/* ✅ 숨긴 네이티브 date input */
-input[type="date"] {
+/* ✅ placeholder 흉내 */
+input[type="date"]::before {
+    content: attr(data-placeholder);
+    color: #888;
     position: absolute;
-    opacity: 0;
-    pointer-events: none;
+    left: 50%;
+    transform: translateX(-50%);
+}
+input[type="date"]:focus::before,
+input[type="date"]:valid::before {
+    content: "";
 }
 /* ✅ 모바일 반응형 */
 @media (max-width: 768px) {
@@ -91,19 +103,13 @@ input[type="date"] {
         font-size: 20px;
         padding: 14px 28px;
     }
+    select, input[type="date"] {
+        font-size: 20px;
+        padding: 14px;
+        height: 60px;
+    }
     .card {
         font-size: 20px;
         padding: 20px;
-    }
-    select, .date-display {
-        font-size: 20px;
-        padding: 14px;
-        height: 55px;
-    }
-    .fab {
-        width: 80px;
-        height: 80px;
-        font-size: 18px;
-        line-height: 80px;
     }
 }
