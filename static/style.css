@@ -81,10 +81,10 @@ select, input[type="date"], input[type="password"] {
 /* ✅ 모바일 반응형 */
 @media (max-width: 768px) {
     body {
-        font-size: 20px; /* 기본 글자 크기 */
+        font-size: 30px; /* 기본 글자 크기 */
     }
     .btn {
-        font-size: 20px;
+        font-size: 30px;
         padding: 14px 28px;
     }
     .card {
