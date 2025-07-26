@@ -62,8 +62,8 @@ h1 {
 .fab.token {
     right: 20px;
 }
-/* 입력 UI */
-select, .date-btn {
+/* 입력 UI (select & date 동일 스타일) */
+select, input[type="date"], input[type="password"] {
     width: 90%;
     padding: 12px;
     font-size: 18px;
@@ -75,11 +75,6 @@ select, .date-btn {
     background: #fff;
     cursor: pointer;
     height: 50px;
-}
-/* Flatpickr 팝업 스타일(기본 테마 + 약간 조정 가능) */
-.flatpickr-calendar {
-    font-size: 16px;
-    border-radius: 8px;
 }
 /* ✅ 모바일 반응형 */
 @media (max-width: 768px) {
@@ -94,7 +89,7 @@ select, .date-btn {
         font-size: 20px;
         padding: 20px;
     }
-    select, .date-btn {
+    select, input[type="date"], input[type="password"] {
         font-size: 20px;
         padding: 14px;
         height: 55px;
