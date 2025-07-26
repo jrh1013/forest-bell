@@ -62,8 +62,8 @@ h1 {
 .fab.token {
     right: 20px;
 }
-/* ✅ 입력 UI (select & date 동일 크기) */
-select, input[type="date"], input[type="password"] {
+/* ✅ 지역 선택 & 날짜 버튼 공통 스타일 */
+select, .date-display {
     width: 90%;
     padding: 12px;
     font-size: 18px;
@@ -76,13 +76,11 @@ select, input[type="date"], input[type="password"] {
     cursor: pointer;
     height: 50px;
 }
-/* ✅ 날짜 placeholder 흉내 */
-input[type="date"]:empty::before {
-    content: attr(data-placeholder);
-    color: #888;
+/* ✅ 숨긴 네이티브 date input */
+input[type="date"] {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
 }
 /* ✅ 모바일 반응형 */
 @media (max-width: 768px) {
@@ -97,7 +95,7 @@ input[type="date"]:empty::before {
         font-size: 20px;
         padding: 20px;
     }
-    select, input[type="date"], input[type="password"] {
+    select, .date-display {
         font-size: 20px;
         padding: 14px;
         height: 55px;
