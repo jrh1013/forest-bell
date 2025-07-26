@@ -43,6 +43,9 @@
 let tempData = [];
 
 async function initEdit() {
+    // ✅ GitHub → DB 동기화
+    await fetch("/api/sync", { method: "POST" });
+    // ✅ 최신 DB 데이터 가져오기
     const res = await fetchData();
     tempData = res; // 기존 DB 데이터 불러오기
     renderTempList();
