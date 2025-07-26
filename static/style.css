@@ -57,13 +57,13 @@ h1 {
     line-height: 60px;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    text-decoration: none; /* ✅ 밑줄 제거 */
+    text-decoration: none;
 }
 .fab.token {
-    right: 20px; /* ✅ 오른쪽 구석 고정 */
+    right: 20px;
 }
 /* 입력 UI */
-select, input[type="date"], input[type="password"] {
+select, .date-btn {
     width: 90%;
     padding: 12px;
     font-size: 18px;
@@ -74,6 +74,10 @@ select, input[type="date"], input[type="password"] {
     text-align: center;
     background: #fff;
     cursor: pointer;
+    height: 50px;
+}
+input[type="date"] {
+    display: none; /* ✅ 숨김 */
 }
 /* ✅ 모바일 반응형 */
 @media (max-width: 768px) {
@@ -88,7 +92,7 @@ select, input[type="date"], input[type="password"] {
         font-size: 20px;
         padding: 20px;
     }
-    select, input[type="date"], input[type="password"] {
+    select, .date-btn {
         font-size: 20px;
         padding: 14px;
         height: 55px;
