@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ 추가 -->
     <title>휴양림 예약 모니터링</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -19,7 +20,6 @@
 async function initIndex() {
     const token = localStorage.getItem("github_token");
     if (token) {
-        // ✅ GitHub → DB 동기화 (토큰 포함)
         const syncRes = await fetch("/api/sync", {
             method: "POST",
             headers: { "Authorization": token }
@@ -30,7 +30,7 @@ async function initIndex() {
     } else {
         console.warn("GitHub token missing, skipping sync");
     }
-    await render(); // ✅ DB 데이터 렌더
+    await render();
 }
 initIndex();
 </script>
