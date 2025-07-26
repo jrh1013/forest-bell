@@ -102,7 +102,7 @@ async function saveAll() {
         const res = await fetch("/api/reservations/bulk", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ items: tempList })
+            body: JSON.stringify(tempList)
         });
 
         if (!res.ok) {
@@ -135,9 +135,9 @@ async function startWorkflow() {
         body: JSON.stringify({ ref: branch })
     });
     if (response.ok) {
-        alert("✅ 워크플로우 실행 요청 완료!");
+        console.log("✅ 워크플로우 실행 요청 완료");
     } else {
-        alert("❌ 워크플로우 실행 실패");
+        console.error("❌ 워크플로우 실행 실패");
     }
 }
 
@@ -181,6 +181,32 @@ async function syncToGitHub(data) {
     }
 }
 
+// ✅ 모니터링 자동 반복 기능 추가
+let monitoring = false;
+let monitorInterval = null;
+
+function toggleMonitoring() {
+    const btn = document.querySelector(".btn-monitor");
+    if (!monitoring) {
+        monitoring = true;
+        btn.textContent = "모니터링 종료";
+        btn.classList.add("btn-gray");
+
+        startWorkflow(); // 즉시 실행
+        monitorInterval = setInterval(() => {
+            console.log("⏳ 5분마다 워크플로우 실행");
+            startWorkflow();
+        }, 5 * 60 * 1000);
+    } else {
+        monitoring = false;
+        btn.textContent = "모니터링 시작";
+        btn.classList.remove("btn-gray");
+        clearInterval(monitorInterval);
+        monitorInterval = null;
+        console.log("🛑 모니터링 중지");
+    }
+}
+
 // ✅ 글로벌 등록
 window.saveToken = saveToken;
 window.addTempItem = addTempItem;
@@ -188,3 +214,4 @@ window.removeTemp = removeTemp;
 window.saveAll = saveAll;
 window.renderTempList = renderTempList;
 window.render = render;
+window.toggleMonitoring = toggleMonitoring;
