@@ -31,24 +31,44 @@
             <option>부산/경남</option>
             <option>제주</option>
         </select>
-        <!-- ✅ 네이티브 date input 유지 -->
-        <input type="date" id="dateInput" data-placeholder="날짜 선택" required>
+
+        <!-- ✅ 버튼 + 숨겨진 input -->
+        <div class="date-btn" id="dateBtn">날짜 선택</div>
+        <input type="date" id="dateInput">
+
         <button class="btn" onclick="addTempItem()">확인</button>
         <button class="btn btn-gray" onclick="cancelAdd()">취소</button>
     </div>
 </div>
+
 <script src="/static/script.js"></script>
 <script>
 let tempData = [];
 
+const dateBtn = document.getElementById("dateBtn");
+const dateInput = document.getElementById("dateInput");
+
+// ✅ 버튼 클릭 → 네이티브 캘린더 열기
+dateBtn.addEventListener("click", () => {
+    if (dateInput.showPicker) {
+        dateInput.showPicker();
+    } else {
+        dateInput.click();
+    }
+});
+
+// ✅ 날짜 선택 → 버튼 텍스트 변경
+dateInput.addEventListener("change", () => {
+    dateBtn.textContent = dateInput.value || "날짜 선택";
+});
+
 async function initEdit() {
     const token = localStorage.getItem("github_token");
     if (token) {
-        const syncRes = await fetch("/api/sync", {
+        await fetch("/api/sync", {
             method: "POST",
             headers: { "Authorization": token }
         });
-        if (!syncRes.ok) console.error("Sync failed");
     }
     const res = await fetchData();
     tempData = res;
@@ -72,11 +92,13 @@ function showAddForm() {
 
 function cancelAdd() {
     document.getElementById("addForm").style.display = "none";
+    dateBtn.textContent = "날짜 선택";
+    dateInput.value = "";
 }
 
 function addTempItem() {
     const region = document.getElementById("region").value;
-    const date = document.getElementById("dateInput").value;
+    const date = dateInput.value;
     if (!region || !date) return alert("❌ 지역과 날짜를 선택하세요.");
     tempData.push({ region, date });
     renderTempList();
