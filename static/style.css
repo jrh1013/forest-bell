@@ -42,7 +42,7 @@ h1 {
     font-weight: bold;
     cursor: pointer;
 }
-/* 플로팅 버튼 */
+/* ✅ 플로팅 버튼 */
 .fab {
     position: fixed;
     bottom: 20px;
@@ -57,12 +57,10 @@ h1 {
     line-height: 60px;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    text-decoration: none; /* ✅ 밑줄 제거 */
 }
 .fab.token {
-    right: 90px;
-}
-.fab {
-    right: 20px;
+    right: 20px; /* ✅ 오른쪽 구석 고정 */
 }
 /* 입력 UI */
 select, input[type="date"], input[type="password"] {
@@ -77,11 +75,10 @@ select, input[type="date"], input[type="password"] {
     background: #fff;
     cursor: pointer;
 }
-
 /* ✅ 모바일 반응형 */
 @media (max-width: 768px) {
     body {
-        font-size: 20px; /* 기본 글자 크기 */
+        font-size: 20px;
     }
     .btn {
         font-size: 20px;
@@ -94,7 +91,7 @@ select, input[type="date"], input[type="password"] {
     select, input[type="date"], input[type="password"] {
         font-size: 20px;
         padding: 14px;
-        height: 55px; /* 입력 UI 높이 확대 */
+        height: 55px;
     }
     .fab {
         width: 80px;
