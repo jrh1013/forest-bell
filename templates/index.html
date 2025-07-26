@@ -17,10 +17,12 @@
 <script src="/static/script.js"></script>
 <script>
 async function initIndex() {
-    // ✅ GitHub → DB 동기화
-    await fetch("/api/sync", { method: "POST" });
-    // ✅ 기존 렌더 실행
-    render();
+    // ✅ GitHub → DB 동기화 후 렌더
+    const syncRes = await fetch("/api/sync", { method: "POST" });
+    if (!syncRes.ok) {
+        console.error("Sync failed");
+    }
+    await render(); // ✅ sync 완료 후 실행
 }
 initIndex();
 </script>
