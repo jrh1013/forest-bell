@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import sqlite3
 import os
 import requests
+import time
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 DB_FILE = "reservations.db"
@@ -73,10 +74,11 @@ def api_bulk_update():
             conn.execute("INSERT INTO reservations (region, date) VALUES (?, ?)", (item["region"], item["date"]))
     return jsonify({"success": True, "count": len(data)})
 
-# ✅ API: GitHub → DB 동기화
+# ✅ API: GitHub → DB 동기화 (캐시 무효화 추가)
 @app.route("/api/sync", methods=["POST"])
 def api_sync():
-    url = "https://raw.githubusercontent.com/jrh1013/forest-bell/main/data/reservations.json"
+    # GitHub Raw URL + timestamp → 캐시 우회
+    url = f"https://raw.githubusercontent.com/jrh1013/forest-bell/main/data/reservations.json?t={int(time.time())}"
     try:
         res = requests.get(url, timeout=10)
         res.raise_for_status()
