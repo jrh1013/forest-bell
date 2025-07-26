@@ -2,7 +2,7 @@ name: Forest Reservation Checker
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # 5분마다 실행
+    - cron: "*/10 * * * *" # 10분마다 실행
   workflow_dispatch:       # ✅ UI 실행 허용
 
 jobs:
