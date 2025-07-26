@@ -43,12 +43,21 @@
 let tempData = [];
 
 async function initEdit() {
-    // ✅ GitHub → DB 동기화
-    const syncRes = await fetch("/api/sync", { method: "POST" });
-    if (!syncRes.ok) {
-        console.error("Sync failed");
+    const token = localStorage.getItem("github_token");
+    if (token) {
+        // ✅ GitHub → DB 동기화 (토큰 포함)
+        const syncRes = await fetch("/api/sync", {
+            method: "POST",
+            headers: { "Authorization": token }
+        });
+        if (!syncRes.ok) {
+            console.error("Sync failed");
+        }
+    } else {
+        console.warn("GitHub token missing, skipping sync");
     }
-    // ✅ 최신 DB 데이터 가져오기
+
+    // ✅ 최신 DB 데이터 불러오기
     const res = await fetchData();
     tempData = res;
     renderTempList();
