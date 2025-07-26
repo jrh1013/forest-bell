@@ -76,8 +76,10 @@ select, .date-btn {
     cursor: pointer;
     height: 50px;
 }
-input[type="date"] {
-    display: none; /* ✅ 숨김 */
+/* Flatpickr 팝업 스타일(기본 테마 + 약간 조정 가능) */
+.flatpickr-calendar {
+    font-size: 16px;
+    border-radius: 8px;
 }
 /* ✅ 모바일 반응형 */
 @media (max-width: 768px) {
