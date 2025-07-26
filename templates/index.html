@@ -17,12 +17,20 @@
 <script src="/static/script.js"></script>
 <script>
 async function initIndex() {
-    // ✅ GitHub → DB 동기화 후 렌더
-    const syncRes = await fetch("/api/sync", { method: "POST" });
-    if (!syncRes.ok) {
-        console.error("Sync failed");
+    const token = localStorage.getItem("github_token");
+    if (token) {
+        // ✅ GitHub → DB 동기화 (토큰 포함)
+        const syncRes = await fetch("/api/sync", {
+            method: "POST",
+            headers: { "Authorization": token }
+        });
+        if (!syncRes.ok) {
+            console.error("Sync failed");
+        }
+    } else {
+        console.warn("GitHub token missing, skipping sync");
     }
-    await render(); // ✅ sync 완료 후 실행
+    await render(); // ✅ DB 데이터 렌더
 }
 initIndex();
 </script>
