@@ -63,7 +63,7 @@ h1 {
     right: 20px;
 }
 /* ✅ 입력 필드 공통 */
-select, .date-btn {
+select, button.date-btn {
     width: 90%;
     padding: 12px;
     font-size: 18px;
@@ -75,6 +75,8 @@ select, .date-btn {
     background: #fff;
     cursor: pointer;
     height: 50px;
+    line-height: 26px;
+    box-sizing: border-box;
 }
 /* ✅ 숨긴 input */
 input[type="date"] {
@@ -88,7 +90,7 @@ input[type="date"] {
         font-size: 20px;
         padding: 14px 28px;
     }
-    select, .date-btn {
+    select, button.date-btn {
         font-size: 20px;
         padding: 14px;
         height: 55px;
