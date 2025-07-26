@@ -11,22 +11,17 @@ body {
 h1 {
     color: #2d8f55;
     margin-bottom: 20px;
-    font-size: 28px;
 }
 .btn {
     display: inline-block;
     background: #2d8f55;
     color: #fff;
     padding: 10px 20px;
-    border-radius: 12px;
+    border-radius: 8px;
     font-size: 18px;
     border: none;
     margin: 10px;
     cursor: pointer;
-    transition: 0.2s ease;
-}
-.btn:hover {
-    background: #249d65;
 }
 .btn-gray {
     background: #bbb;
@@ -36,12 +31,11 @@ h1 {
     margin: 10px auto;
     padding: 15px;
     width: 90%;
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 18px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 .delete {
     color: red;
@@ -68,45 +62,36 @@ h1 {
 .fab.token {
     right: 20px;
 }
-/* ✅ 입력 필드 */
-select, input[type="date"] {
+/* ✅ 입력 필드 공통 */
+select, .date-btn {
     width: 90%;
     padding: 12px;
     font-size: 18px;
     border: 1px solid #ccc;
-    border-radius: 12px;
+    border-radius: 8px;
     margin: 12px auto;
     display: block;
     text-align: center;
     background: #fff;
     cursor: pointer;
-    height: 55px;
+    height: 50px;
 }
-/* ✅ placeholder 흉내 */
-input[type="date"]::before {
-    content: attr(data-placeholder);
-    color: #888;
+/* ✅ 숨긴 input */
+input[type="date"] {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
-input[type="date"]:focus::before,
-input[type="date"]:valid::before {
-    content: "";
+    opacity: 0;
+    pointer-events: none;
 }
 /* ✅ 모바일 반응형 */
 @media (max-width: 768px) {
-    body {
-        font-size: 20px;
-    }
     .btn {
         font-size: 20px;
         padding: 14px 28px;
     }
-    select, input[type="date"] {
+    select, .date-btn {
         font-size: 20px;
         padding: 14px;
-        height: 60px;
+        height: 55px;
     }
     .card {
         font-size: 20px;
