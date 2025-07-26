@@ -64,10 +64,10 @@ h1 {
 .fab {
     right: 20px;
 }
-/* 입력 UI (select & date 크기 동일) */
+/* 입력 UI */
 select, input[type="date"], input[type="password"] {
     width: 90%;
-    padding: 14px;
+    padding: 12px;
     font-size: 18px;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -76,26 +76,12 @@ select, input[type="date"], input[type="password"] {
     text-align: center;
     background: #fff;
     cursor: pointer;
-    height: 50px; /* 높이 고정 */
 }
 
-/* 날짜 placeholder 스타일 */
-input[type="date"]::before {
-    content: attr(data-placeholder);
-    color: #888;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: none;
-}
-input[type="date"]:valid::before {
-    content: "";
-}
-
-/* 모바일 반응형 개선 */
+/* ✅ 모바일 반응형 */
 @media (max-width: 768px) {
     body {
-        font-size: 20px;
+        font-size: 20px; /* 기본 글자 크기 */
     }
     .btn {
         font-size: 20px;
@@ -108,6 +94,7 @@ input[type="date"]:valid::before {
     select, input[type="date"], input[type="password"] {
         font-size: 20px;
         padding: 14px;
+        height: 55px; /* 입력 UI 높이 확대 */
     }
     .fab {
         width: 80px;
