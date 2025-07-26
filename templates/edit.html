@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ 추가 -->
     <title>예약 리스트 편집</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -30,7 +31,6 @@
             <option>부산/경남</option>
             <option>제주</option>
         </select>
-        <!-- ✅ 날짜 입력에 placeholder 추가 -->
         <input type="date" id="dateInput" data-placeholder="날짜 선택" required>
         <button class="btn" onclick="addTempItem()">확인</button>
         <button class="btn btn-gray" onclick="cancelAdd()">취소</button>
