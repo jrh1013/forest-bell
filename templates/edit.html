@@ -31,11 +31,8 @@
             <option>부산/경남</option>
             <option>제주</option>
         </select>
-
-        <!-- ✅ 깔끔한 날짜 선택 버튼 -->
-        <div class="date-display" id="dateDisplay">날짜 선택</div>
-        <input type="date" id="dateInput">
-
+        <!-- ✅ 네이티브 date input 유지 -->
+        <input type="date" id="dateInput" data-placeholder="날짜 선택" required>
         <button class="btn" onclick="addTempItem()">확인</button>
         <button class="btn btn-gray" onclick="cancelAdd()">취소</button>
     </div>
@@ -43,18 +40,6 @@
 <script src="/static/script.js"></script>
 <script>
 let tempData = [];
-
-// ✅ 날짜 선택 버튼 로직
-const dateDisplay = document.getElementById("dateDisplay");
-const dateInput = document.getElementById("dateInput");
-
-dateDisplay.addEventListener("click", () => {
-    dateInput.click(); // ✅ 네이티브 캘린더 열기
-});
-
-dateInput.addEventListener("change", () => {
-    dateDisplay.textContent = dateInput.value || "날짜 선택";
-});
 
 async function initEdit() {
     const token = localStorage.getItem("github_token");
@@ -87,13 +72,11 @@ function showAddForm() {
 
 function cancelAdd() {
     document.getElementById("addForm").style.display = "none";
-    dateDisplay.textContent = "날짜 선택";
-    dateInput.value = "";
 }
 
 function addTempItem() {
     const region = document.getElementById("region").value;
-    const date = dateInput.value;
+    const date = document.getElementById("dateInput").value;
     if (!region || !date) return alert("❌ 지역과 날짜를 선택하세요.");
     tempData.push({ region, date });
     renderTempList();
