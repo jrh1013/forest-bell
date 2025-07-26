@@ -16,7 +16,13 @@
 </div>
 <script src="/static/script.js"></script>
 <script>
-render();
+async function initIndex() {
+    // ✅ GitHub → DB 동기화
+    await fetch("/api/sync", { method: "POST" });
+    // ✅ 기존 렌더 실행
+    render();
+}
+initIndex();
 </script>
 </body>
 </html>
