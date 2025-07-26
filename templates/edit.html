@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>예약 리스트 편집</title>
     <link rel="stylesheet" href="/static/style.css">
+    <!-- ✅ Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
 <div class="container">
@@ -31,32 +33,34 @@
             <option>부산/경남</option>
             <option>제주</option>
         </select>
-        <!-- ✅ 커스텀 날짜 버튼 -->
+        <!-- ✅ 날짜 선택 버튼 -->
         <button type="button" class="date-btn" id="dateBtn">날짜 선택</button>
-        <!-- ✅ 숨겨진 네이티브 date input -->
-        <input type="date" id="dateInput">
         <button class="btn" onclick="addTempItem()">확인</button>
         <button class="btn btn-gray" onclick="cancelAdd()">취소</button>
     </div>
 </div>
+
+<!-- ✅ Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
 <script src="/static/script.js"></script>
 <script>
 let tempData = [];
+let selectedDate = ""; // ✅ 선택한 날짜 저장
 
-// ✅ 날짜 선택 버튼 기능
+// ✅ Flatpickr 초기화
 const dateBtn = document.getElementById("dateBtn");
-const dateInput = document.getElementById("dateInput");
-
-dateBtn.addEventListener("click", () => {
-    dateInput.showPicker(); // ✅ 네이티브 캘린더 열기
-});
-
-dateInput.addEventListener("change", () => {
-    if (dateInput.value) {
-        dateBtn.textContent = dateInput.value; // ✅ 선택한 날짜로 버튼 텍스트 변경
-    } else {
-        dateBtn.textContent = "날짜 선택";
+const calendar = flatpickr(dateBtn, {
+    locale: "ko", // ✅ 한국어
+    dateFormat: "Y-m-d", // ✅ YYYY-MM-DD
+    clickOpens: false, // ✅ 버튼 클릭 시 open() 호출로 열기
+    onChange: function(selectedDates, dateStr) {
+        selectedDate = dateStr;
+        dateBtn.textContent = dateStr || "날짜 선택";
     }
+});
+dateBtn.addEventListener("click", () => {
+    calendar.open();
 });
 
 async function initEdit() {
@@ -90,15 +94,15 @@ function showAddForm() {
 
 function cancelAdd() {
     document.getElementById("addForm").style.display = "none";
-    dateBtn.textContent = "날짜 선택"; // ✅ 초기화
-    dateInput.value = "";
+    dateBtn.textContent = "날짜 선택";
+    selectedDate = "";
+    calendar.clear();
 }
 
 function addTempItem() {
     const region = document.getElementById("region").value;
-    const date = dateInput.value;
-    if (!region || !date) return alert("❌ 지역과 날짜를 선택하세요.");
-    tempData.push({ region, date });
+    if (!region || !selectedDate) return alert("❌ 지역과 날짜를 선택하세요.");
+    tempData.push({ region, date: selectedDate });
     renderTempList();
     cancelAdd();
 }
