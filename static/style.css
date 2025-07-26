@@ -62,7 +62,7 @@ h1 {
 .fab.token {
     right: 20px;
 }
-/* 입력 UI (select & date 동일 스타일) */
+/* ✅ 입력 UI (select & date 동일 크기) */
 select, input[type="date"], input[type="password"] {
     width: 90%;
     padding: 12px;
@@ -75,6 +75,14 @@ select, input[type="date"], input[type="password"] {
     background: #fff;
     cursor: pointer;
     height: 50px;
+}
+/* ✅ 날짜 placeholder 흉내 */
+input[type="date"]:empty::before {
+    content: attr(data-placeholder);
+    color: #888;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 /* ✅ 모바일 반응형 */
 @media (max-width: 768px) {
